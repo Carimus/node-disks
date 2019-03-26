@@ -31,6 +31,7 @@
         "node/prefer-global/url-search-params": ["error", "always"],
         "node/prefer-global/url": ["error", "always"],
         "node/no-unsupported-features/es-syntax": "off",
+        "@typescript-eslint/explicit-function-return-type": "error",
         "curly": ["error", "all"],
         "max-len": ["error", { "code": 140, "ignoreUrls": true }],
         "no-undefined": "error",

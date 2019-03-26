@@ -8,8 +8,7 @@
         "build": "tsc",
         "test": "jest",
         "test:watch": "jest --watch",
-        "lint": "eslint 'jest.config.js' 'src/**/*.ts' || true",
-        "lintdiff": "git diff --diff-filter=d --name-only --cached --relative | grep '\\.ts$' | xargs eslint || true",
+        "lint": "eslint '{src,__{tests,mocks}__,.}/**/*.{ts,tsx,js,jsx}' || true",
         "pretty": "prettier --write '{src,__{tests,mocks}__,.}/**/*.{json,md,yml,ts,tsx,js,jsx}'",
         "fixcode": "yarn run pretty"
     },
@@ -45,10 +44,12 @@
         }
     },
     "lint-staged": {
-        "*.{ts,tsx,js,jsx}": [
-            "eslint"
+        "{src,__{tests,mocks}__,.}/**/*.{ts,tsx,js,jsx}": [
+            "prettier --write",
+            "eslint",
+            "git add"
         ],
-        "*.{json,md,yml,ts,tsx,js,jsx}": [
+        "{src,__{tests,mocks}__,.}/**/*.{json,md,yml}": [
             "prettier --write",
             "git add"
         ]
