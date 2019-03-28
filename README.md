@@ -9,6 +9,7 @@ re-usable library on npm.
  - Precommit linting
  - Precommit formatting via [Prettier](https://prettier.io)
  - Prepublish TypeScript build for distribution on npm
+ - Ready-to-use GitHub Actions workflow for releasing on push to `master`
 
 ## Using this Template
 
@@ -49,15 +50,16 @@ git push -u origin master
 
 ## Documentation
 
- - Publishing the package **[TODO]**
+ - [Publishing to NPM](./docs/PUBLISHING.md)
  - Linting and Prettier **[TODO]**
- - WebStorm + Eslint + Prettier **[TODO]**
+ - Usage with WebStorm **[TODO]**
 
 ## TODOs
 
  - [ ] Write a script to automate README and package.json customizations
- - [ ] Document CI setup required for `semantic-release`
  - [ ] More documentation
+ - [ ] `commitzen`
+ - [ ] `commitlint`
 
 ----------------------------------------
 
@@ -79,6 +81,45 @@ yarn
 ```
 
 to install all of the necessary dependencies and tools.
+
+## IMPORTANT: Commit Messages
+
+This package uses [`semantic-release`](https://github.com/semantic-release/semantic-release) to
+automatically version and publish to NPM. Version numbers are automatically generated based on the
+commit messages since the previous release.
+
+**The commit message format must be followed for this process to work.**
+
+[Read about the format here](https://github.com/semantic-release/semantic-release#commit-message-format)
+and in even more detail [here](https://github.com/angular/angular.js/blob/master/DEVELOPERS.md#-git-commit-guidelines)
+
+In brief, commits should use messages following the format:
+
+```
+<type>(<scope>): <subject>
+<BLANK LINE>
+<body>
+<BLANK LINE>
+<footer>
+```
+
+Where:
+
+ - `<type>` is **required** and must be one of `feat`, `fix`, `docs`, `style`, `refactor`, `perf`,
+   `test`, or `chore`
+ - `<scope>` is **optional** and is the service or component modified by the commit. `*` can be
+   used to indicate more than one scope was modified.
+ - `<subject>` is **required** and must be a (preferably less than 50 characters) summary of the
+   commit changes and should be in the present, imperative tense: "change" not "changed" nor
+   "changes"
+ - `<body>` is **optional** and should describe the motivation for the changes and how the new
+   behaviour is different from the previous behaviour if provided.
+ - `<footer>` is **optional** and should include information about breaking changes if applicable.
+   This is also where issue mentions and other trigger keywords / tags should be placed.
+
+If a change introduces backwards-incompatible behaviour it must include `BREAKING CHANGE:` in the
+footer and a description of what the breaking change was and why. This will cause a major version
+bump.
 
 ## Next Steps
 

@@ -53,7 +53,7 @@
             "eslint",
             "git add"
         ],
-        "{src,__{tests,mocks}__,.}/**/*.{json,md,yml}": [
+        "{src,docs,__{tests,mocks}__,.}/**/*.{json,md,yml}": [
             "prettier --write",
             "git add"
         ]
