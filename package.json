@@ -1,7 +1,7 @@
 {
-    "name": "@carimus/node-typescript-package-template",
+    "name": "@carimus/node-disks",
     "version": "0.0.0-development",
-    "description": "",
+    "description": "An abstraction for local/remote disks for node inspired by The League of Extraordinary Packages's FlySystem.",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
     "scripts": {
@@ -15,7 +15,7 @@
         "semantic-release": "semantic-release",
         "release": "yarn run semantic-release"
     },
-    "repository": "https://bitbucket.org/Carimus/carimus-node-ts-package-template",
+    "repository": "https://github.com/Carimus/node-disks",
     "author": "Carimus",
     "license": "MIT",
     "private": false,
