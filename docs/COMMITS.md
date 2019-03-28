@@ -6,6 +6,10 @@ format.
 It's described briefly by `semantic-release` [here](https://github.com/semantic-release/semantic-release#commit-message-format)
 and in more detail by the Angular docs [here](https://github.com/angular/angular.js/blob/master/DEVELOPERS.md#-git-commit-guidelines).
 
+## Linting
+
+Commit message format is enforced using [`commitlint`](https://conventional-changelog.github.io/commitlint).
+
 ## Automated
 
 Simply run
