@@ -1,6 +1,6 @@
 {
     "name": "@carimus/node-typescript-package-template",
-    "version": "0.0.0",
+    "version": "0.0.0-development",
     "description": "",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
@@ -11,7 +11,9 @@
         "test:watch": "jest --watch",
         "lint": "eslint '{src,__{tests,mocks}__,.}/**/*.{ts,tsx,js,jsx}' || true",
         "pretty": "prettier --write '{src,__{tests,mocks}__,.}/**/*.{json,md,yml,ts,tsx,js,jsx}'",
-        "fixcode": "yarn run pretty"
+        "fixcode": "yarn run pretty",
+        "semantic-release": "semantic-release",
+        "release": "yarn run semantic-release"
     },
     "repository": "https://bitbucket.org/Carimus/carimus-node-ts-package-template",
     "author": "Carimus",
@@ -33,6 +35,7 @@
         "jest": "^24.5.0",
         "lint-staged": "^8.1.5",
         "prettier": "1.16.4",
+        "semantic-release": "^15.13.3",
         "ts-jest": "^24.0.0",
         "typescript": "^3.3.4000"
     },
