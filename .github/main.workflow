@@ -14,8 +14,14 @@ action "Test" {
   args = "test"
 }
 
-action "Release" {
+action "Only On Master" {
   needs = "Test"
+  uses = "actions/bin/filter@master"
+  args = "branch master"
+}
+
+action "Release" {
+  needs = "Master"
   uses = "nuxt/actions-yarn@97f98f200b7fd42a001f88e7bdfc14d64d695ab2"
   secrets = ["GH_TOKEN", "NPM_TOKEN"]
   args = "release"
