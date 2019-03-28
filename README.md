@@ -34,9 +34,10 @@ Customize the `README.md` for this project:
 Customize the `package.json` for this project:
 
 1. Update the `name` to be the final published name of this package, i.e. `@carimus/node-foo-package`
-2. Update the description appropriately.
+2. Update the `description` appropriately.
+3. Update the `repository` to point the project repository.
 
-**Note:** Don't change the version, it's automatically managed by `semantic-release`.
+**Note:** Don't change the `version`, it's automatically managed by `semantic-release`.
 
 Then just commit those customizations and push the code up to the project repo:
 
