@@ -17,6 +17,24 @@ yarn
 
 to install all of the necessary dependencies and tools.
 
+## Commit Messages
+
+This package uses [`semantic-release`](https://github.com/semantic-release/semantic-release) to
+automatically version and publish to NPM. Version numbers are automatically generated based on the
+commit messages since the previous release.
+
+**The [commit message format](./docs/COMMITS.md) must be followed for this process to work.**
+
+Fortunately, I've got your back. Simply run
+
+```
+yarn run commit
+```
+
+To use `commitizen` to generate your commit message via friendly prompts.
+
+Commit message format is enforced using [`commitlint`](https://conventional-changelog.github.io/commitlint).
+
 ## Next Steps
 
 This project is based on the `carimus-node-ts-package-template`. Check out the

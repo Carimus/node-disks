@@ -13,16 +13,21 @@
         "pretty": "prettier --write '{src,__{tests,mocks}__,.}/**/*.{json,md,yml,ts,tsx,js,jsx}'",
         "fixcode": "yarn run pretty",
         "semantic-release": "semantic-release",
-        "release": "yarn run semantic-release"
+        "release": "yarn run semantic-release",
+        "commit": "git-cz"
     },
     "repository": "https://github.com/Carimus/node-disks",
     "author": "Carimus",
     "license": "MIT",
     "private": false,
     "devDependencies": {
+        "@commitlint/cli": "^7.5.2",
+        "@commitlint/config-conventional": "^7.5.0",
         "@types/jest": "^24.0.11",
         "@typescript-eslint/eslint-plugin": "^1.5.0",
         "@typescript-eslint/parser": "^1.5.0",
+        "commitizen": "^3.0.7",
+        "cz-conventional-changelog": "2.1.0",
         "eslint": "^5.15.3",
         "eslint-config-prettier": "^4.1.0",
         "eslint-config-standard": "^12.0.0",
@@ -44,6 +49,7 @@
     },
     "husky": {
         "hooks": {
+            "commit-msg": "commitlint -E HUSKY_GIT_PARAMS",
             "pre-commit": "lint-staged"
         }
     },
@@ -53,9 +59,19 @@
             "eslint",
             "git add"
         ],
-        "{src,__{tests,mocks}__,.}/**/*.{json,md,yml}": [
+        "{src,docs,__{tests,mocks}__,.}/**/*.{json,md,yml}": [
             "prettier --write",
             "git add"
+        ]
+    },
+    "config": {
+        "commitizen": {
+            "path": "./node_modules/cz-conventional-changelog"
+        }
+    },
+    "commitlint": {
+        "extends": [
+            "@commitlint/config-conventional"
         ]
     }
 }
