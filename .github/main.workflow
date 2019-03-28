@@ -14,7 +14,7 @@ action "Test" {
   args = "test"
 }
 
-action "Only On Master" {
+action "Master" {
   needs = "Test"
   uses = "actions/bin/filter@master"
   args = "branch master"
