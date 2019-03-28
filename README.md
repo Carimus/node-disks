@@ -40,6 +40,11 @@ Customize the `package.json` for this project:
 
 **Note:** Don't change the `version`, it's automatically managed by `semantic-release`.
 
+Other cleanup:
+
+1. Delete the `./docs` directory. These docs are maintained in the template. The README links to
+   them below.
+
 Then just commit those customizations and push the code up to the project repo:
 
 ```
@@ -51,14 +56,15 @@ git push -u origin master
 ## Documentation
 
  - [Publishing to NPM](./docs/PUBLISHING.md)
+ - [Commit Message Format](./docs/COMMITS.md)
  - Linting and Prettier **[TODO]**
  - Usage with WebStorm **[TODO]**
+ - Pulling upstream changes from template **[TODO]**
 
 ## TODOs
 
  - [ ] Write a script to automate README and package.json customizations
  - [ ] More documentation
- - [ ] `commitzen`
  - [ ] `commitlint`
 
 ----------------------------------------
@@ -88,38 +94,15 @@ This package uses [`semantic-release`](https://github.com/semantic-release/seman
 automatically version and publish to NPM. Version numbers are automatically generated based on the
 commit messages since the previous release.
 
-**The commit message format must be followed for this process to work.**
+**The [commit message format](./docs/COMMITS.md) must be followed for this process to work.**
 
-[Read about the format here](https://github.com/semantic-release/semantic-release#commit-message-format)
-and in even more detail [here](https://github.com/angular/angular.js/blob/master/DEVELOPERS.md#-git-commit-guidelines)
-
-In brief, commits should use messages following the format:
+Fortunately, I've got your back. Simply run
 
 ```
-<type>(<scope>): <subject>
-<BLANK LINE>
-<body>
-<BLANK LINE>
-<footer>
+yarn run commit
 ```
 
-Where:
-
- - `<type>` is **required** and must be one of `feat`, `fix`, `docs`, `style`, `refactor`, `perf`,
-   `test`, or `chore`
- - `<scope>` is **optional** and is the service or component modified by the commit. `*` can be
-   used to indicate more than one scope was modified.
- - `<subject>` is **required** and must be a (preferably less than 50 characters) summary of the
-   commit changes and should be in the present, imperative tense: "change" not "changed" nor
-   "changes"
- - `<body>` is **optional** and should describe the motivation for the changes and how the new
-   behaviour is different from the previous behaviour if provided.
- - `<footer>` is **optional** and should include information about breaking changes if applicable.
-   This is also where issue mentions and other trigger keywords / tags should be placed.
-
-If a change introduces backwards-incompatible behaviour it must include `BREAKING CHANGE:` in the
-footer and a description of what the breaking change was and why. This will cause a major version
-bump.
+To use `commitizen` to generate your commit message via friendly prompts.
 
 ## Next Steps
 
