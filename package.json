@@ -14,6 +14,7 @@
         "fixcode": "yarn run pretty",
         "semantic-release": "semantic-release",
         "release": "yarn run semantic-release",
+        "release-ci": "echo 'unsafe-perm = true' > ./npmrc && yarn run semantic-release && rm -rf ./npmrc",
         "commit": "git-cz"
     },
     "repository": "https://github.com/Carimus/node-disks",

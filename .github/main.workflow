@@ -24,5 +24,5 @@ action "Release" {
   needs = "Master"
   uses = "nuxt/actions-yarn@97f98f200b7fd42a001f88e7bdfc14d64d695ab2"
   secrets = ["GH_TOKEN", "NPM_TOKEN"]
-  args = "release"
+  args = "release-ci"
 }
