@@ -54,3 +54,9 @@ To summarize:
 4. Scroll down to `eslint.additional.file.extensions`
 5. Set its value to `js,jsx,ts,tsx`
 6. If necessary, do File > Invalidate Caches / Restart 
+
+## TODO
+
+- [ ] Tests
+- [ ] Docs (for now check out the well documented source code)
+- [ ] Don't rely on `fs.readdir`'s `withFileTypes` so as to support all node 10 versions.
