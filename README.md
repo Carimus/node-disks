@@ -57,6 +57,7 @@ To summarize:
 
 ## TODO
 
+- [ ] Cache disks in a manager instance once they're loaded by name
 - [ ] Tests
 - [ ] Docs (for now check out the well documented source code)
-- [ ] Don't rely on `fs.readdir`'s `withFileTypes` so as to support all node 10 versions.
+- [ ] Don't rely on `fs.readdir`'s `withFileTypes` so as to support all node 10 versions
