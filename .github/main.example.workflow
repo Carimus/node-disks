@@ -4,13 +4,13 @@ workflow "Test and Release" {
 }
 
 action "Install" {
-  uses = "nuxt/actions-yarn@node-10"
+  uses = "nuxt/actions-yarn@97f98f200b7fd42a001f88e7bdfc14d64d695ab2"
   args = "install"
 }
 
 action "Test" {
   needs = "Install"
-  uses = "nuxt/actions-yarn@node-10"
+  uses = "nuxt/actions-yarn@97f98f200b7fd42a001f88e7bdfc14d64d695ab2"
   args = "test"
 }
 
@@ -22,7 +22,7 @@ action "Master" {
 
 action "Release" {
   needs = "Master"
-  uses = "nuxt/actions-yarn@node-10"
+  uses = "nuxt/actions-yarn@97f98f200b7fd42a001f88e7bdfc14d64d695ab2"
   secrets = ["GH_TOKEN", "NPM_TOKEN"]
-  args = "release"
+  args = "release-ci"
 }
