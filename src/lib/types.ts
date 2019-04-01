@@ -4,6 +4,7 @@ import { S3 } from 'aws-sdk';
  * Available drivers
  */
 export enum DiskDriver {
+    Memory = 'memory',
     Local = 'local',
     S3 = 's3',
 }

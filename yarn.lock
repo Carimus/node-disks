@@ -644,6 +644,11 @@
   dependencies:
     "@types/node" "*"
 
+"@types/verror@^1.10.3":
+  version "1.10.3"
+  resolved "https://registry.yarnpkg.com/@types/verror/-/verror-1.10.3.tgz#8be16b0e750018fd4e2e4a766b8f2351d8b5df6a"
+  integrity sha512-7Jz0MPsW2pWg5dJfEp9nJYI0RDCYfgjg2wIo5HfQ8vOJvUq0/BxT7Mv2wNQvkKBmV9uT++6KF3reMnLmh/0HrA==
+
 "@types/yargs@^12.0.2", "@types/yargs@^12.0.9":
   version "12.0.10"
   resolved "https://registry.yarnpkg.com/@types/yargs/-/yargs-12.0.10.tgz#17a8ec65cd8e88f51b418ceb271af18d3137df67"
@@ -2546,6 +2551,11 @@ fast-deep-equal@^2.0.1:
   resolved "https://registry.yarnpkg.com/fast-deep-equal/-/fast-deep-equal-2.0.1.tgz#7b05218ddf9667bf7f370bf7fdb2cb15fdd0aa49"
   integrity sha1-ewUhjd+WZ79/Nwv3/bLLFf3Qqkk=
 
+fast-extend@0.0.2:
+  version "0.0.2"
+  resolved "https://registry.yarnpkg.com/fast-extend/-/fast-extend-0.0.2.tgz#f5ec42cf40b9460f521a6387dfb52deeed671dbd"
+  integrity sha1-9exCz0C5Rg9SGmOH37Ut7u1nHb0=
+
 fast-glob@^2.2.6:
   version "2.2.6"
   resolved "https://registry.yarnpkg.com/fast-glob/-/fast-glob-2.2.6.tgz#a5d5b697ec8deda468d85a74035290a025a95295"
@@ -2759,6 +2769,11 @@ fs-minipass@^1.2.5:
   integrity sha512-JhBl0skXjUPCFH7x6x61gQxrKyXsxB5gcgePLZCwfyCGGsTISMoIeObbrvVeP6Xmyaudw4TT43qV2Gz+iyd2oQ==
   dependencies:
     minipass "^2.2.1"
+
+fs-monkey@^0.3.3:
+  version "0.3.3"
+  resolved "https://registry.yarnpkg.com/fs-monkey/-/fs-monkey-0.3.3.tgz#7960bb2b1fa2653731b9d0e2e84812a7e8b3664a"
+  integrity sha512-FNUvuTAJ3CqCQb5ELn+qCbGR/Zllhf2HtwsdAtBi59s1WeCjKMT81fHcSu7dwIskqGVK+MmOrb7VOBlq3/SItw==
 
 fs-vacuum@^1.2.10, fs-vacuum@~1.2.10:
   version "1.2.10"
@@ -4805,6 +4820,14 @@ mem@^4.0.0:
     map-age-cleaner "^0.1.1"
     mimic-fn "^2.0.0"
     p-is-promise "^2.0.0"
+
+memfs@^2.15.2:
+  version "2.15.2"
+  resolved "https://registry.yarnpkg.com/memfs/-/memfs-2.15.2.tgz#199b64580cf849ea641d8fac81d96742bfebd26d"
+  integrity sha512-jFC2mc3Aa224nJB824vbJzuiksf3+wPjFSKrXS7bA3o3H0Yy4/bh0R1nAsQyL/P80PVyT56ZowQJ+NGniHWhVQ==
+  dependencies:
+    fast-extend "0.0.2"
+    fs-monkey "^0.3.3"
 
 meow@5.0.0:
   version "5.0.0"
@@ -7549,7 +7572,7 @@ validate-npm-package-name@^3.0.0, validate-npm-package-name@~3.0.0:
   dependencies:
     builtins "^1.0.3"
 
-verror@1.10.0:
+verror@1.10.0, verror@^1.10.0:
   version "1.10.0"
   resolved "https://registry.yarnpkg.com/verror/-/verror-1.10.0.tgz#3a105ca17053af55d6e270c1f8288682e18da400"
   integrity sha1-OhBcoXBTr1XW4nDB+CiGguGNpAA=

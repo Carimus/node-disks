@@ -1,6 +1,6 @@
 import * as AWS from 'aws-sdk';
 import { Readable, Writable } from 'stream';
-import { Disk } from '../../Disk';
+import { Disk } from '../..';
 import {
     NotAFileError,
     NotFoundError,
@@ -13,7 +13,7 @@ import {
     S3NodeBody,
     S3ObjectParams,
 } from './types';
-import { DiskListingObject, DiskObjectType } from '../../types';
+import { DiskListingObject, DiskObjectType } from '../../lib/types';
 import toArray = require('stream-to-array');
 
 /**

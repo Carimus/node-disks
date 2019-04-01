@@ -1,5 +1,5 @@
 import { Body, BucketName, ObjectKey } from 'aws-sdk/clients/s3';
-import { DiskConfig } from '../../types';
+import { DiskConfig } from '../../lib/types';
 
 export interface S3DiskConfig extends DiskConfig {
     /**

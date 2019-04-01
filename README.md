@@ -4,8 +4,8 @@ An abstraction for local/remote disks for node inspired by The League of Extraor
 
 ## Prerequisites
 
- - Node >= 10
- - [Yarn](https://yarnpkg.com)
+-   Node >= 10
+-   [Yarn](https://yarnpkg.com)
 
 ## Getting Started
 
@@ -53,11 +53,11 @@ To summarize:
 3. Click/select "Registry..."
 4. Scroll down to `eslint.additional.file.extensions`
 5. Set its value to `js,jsx,ts,tsx`
-6. If necessary, do File > Invalidate Caches / Restart 
+6. If necessary, do File > Invalidate Caches / Restart
 
 ## TODO
 
-- [ ] Cache disks in a manager instance once they're loaded by name
-- [ ] Tests
-- [ ] Docs (for now check out the well documented source code)
-- [ ] Don't rely on `fs.readdir`'s `withFileTypes` so as to support all node 10 versions
+-   [ ] Cache disks in a manager instance once they're loaded by name
+-   [ ] Tests
+-   [ ] Docs (for now check out the well documented source code)
+-   [ ] Don't rely on `fs.readdir`'s `withFileTypes` so as to support all node 10 versions

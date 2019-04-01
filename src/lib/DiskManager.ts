@@ -1,7 +1,5 @@
 import { has } from 'ramda';
-import { S3Disk } from './drivers/s3/S3Disk';
-import { LocalDisk } from './drivers/local/LocalDisk';
-import { BadDriverError, DiskNotFoundError } from './errors';
+import { BadDriverError, DiskNotFoundError } from '../errors';
 import { Disk } from './Disk';
 import {
     DiskConfig,
@@ -9,10 +7,15 @@ import {
     DiskManagerConfig,
     DiskManagerOptions,
 } from './types';
-import { S3DiskConfig } from './drivers/s3/types';
-import { LocalDiskConfig } from './drivers/local/types';
+import { S3Disk, LocalDisk, MemoryDisk } from '..';
+import { S3DiskConfig } from '../drivers/s3/types';
+import { LocalDiskConfig } from '../drivers/local/types';
 
 export type AnyDiskConfig = DiskConfig | S3DiskConfig | LocalDiskConfig | null;
+
+export interface DiskManagerDiskRegistry {
+    [key: string]: Disk;
+}
 
 /**
  * A disk manager
@@ -23,8 +26,16 @@ export class DiskManager {
      */
     private config: DiskManagerConfig;
 
+    /**
+     * The cache of disks that have been got with...
+     *
+     * @see getDisk
+     */
+    private disks: DiskManagerDiskRegistry;
+
     public constructor(config: DiskManagerConfig) {
         this.config = config;
+        this.disks = {};
     }
 
     /**
@@ -51,6 +62,17 @@ export class DiskManager {
     };
 
     /**
+     * Store a disk in the disk cache by name.
+     *
+     * @param name
+     * @param disk
+     */
+    public registerDisk = (name: string, disk: Disk): Disk => {
+        this.disks[name] = disk;
+        return disk;
+    };
+
+    /**
      * Get a `Disk` instance for the configured disk.
      *
      * Throws errors if the named disk does not exist in the config or if the
@@ -63,15 +85,26 @@ export class DiskManager {
         name: string = 'default',
         options: DiskManagerOptions = {},
     ): Disk => {
+        if (has(name, this.disks)) {
+            return this.disks[name];
+        }
         const { s3Client = null } = options;
         const diskConfig: AnyDiskConfig = this.resolveDiskConfig(name);
         if (diskConfig) {
             const { driver = null } = diskConfig;
             switch (driver) {
                 case DiskDriver.Local:
-                    return new LocalDisk(diskConfig as LocalDiskConfig);
+                    return this.registerDisk(
+                        name,
+                        new LocalDisk(diskConfig as LocalDiskConfig),
+                    );
+                case DiskDriver.Memory:
+                    return this.registerDisk(name, new MemoryDisk(diskConfig));
                 case DiskDriver.S3:
-                    return new S3Disk(diskConfig as S3DiskConfig, s3Client);
+                    return this.registerDisk(
+                        name,
+                        new S3Disk(diskConfig as S3DiskConfig, s3Client),
+                    );
                 default:
                     throw new BadDriverError(name, driver);
             }
