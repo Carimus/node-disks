@@ -39,6 +39,11 @@ Customize the `package.json` for this project:
 
 **Note:** Don't change the `version`, it's automatically managed by `semantic-release`.
 
+Additionally the following customization steps are optional but recommended:
+
+1. Delete the `docs/` directory. The developer looking for more information should find their way
+   here.
+
 Then just commit those customizations and push the code up to the project repo:
 
 ```
@@ -84,3 +89,9 @@ npm install --save @carimus/PROJECT-PACKAGE-NAME-HERE
 ## Usage
 
 TODO
+
+## Development
+
+This project is based on the `carimus-node-ts-package-template`. Check out the
+[README and docs there](https://bitbucket.org/Carimus/carimus-node-ts-package-template/src/master/README.md)
+for more up to date information on the development process and tools available.

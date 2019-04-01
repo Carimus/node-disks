@@ -38,12 +38,6 @@ yarn run commit --retry
 
 Commit message format is enforced using [`commitlint`](https://conventional-changelog.github.io/commitlint).
 
-## Next Steps
-
-This project is based on the `carimus-node-ts-package-template`. Check out the
-[README and docs there](https://bitbucket.org/Carimus/carimus-node-ts-package-template/src/master/README.md)
-for more up to date information on the development process and tools available.
-
 ## Important Note For WebStorm Users!
 
 [There's a bug](https://youtrack.jetbrains.com/issue/WEB-36988) in the stable version of WebStorm
