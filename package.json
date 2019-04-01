@@ -5,7 +5,7 @@
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
     "scripts": {
-        "build": "tsc",
+        "build": "rm -rf ./dist && tsc",
         "prepublishOnly": "yarn run build",
         "test": "jest",
         "test:watch": "jest --watch",
