@@ -39,22 +39,22 @@ const foo: Disk = new LocalDisk({ root: '/tmp' });
 const bar: Disk = new S3Disk({ bucket: 'test' });
 
 // Wrap everything in a self-executing async function.
-(async () => {    
+(async () => {
     // Write a file to the foo disk
     await foo.write('foo.txt', 'This is a foo file');
-    
+
     // Stream the file from the foo disk to the bar disk as bar.txt
     const fooReadStream = await foo.createReadStream('foo.txt');
     const barWriteStream = await bar.createWriteStream('bar.txt');
-    
+
     // Initiate the piping and wait for it to finish
     fooReadStream.pipe(barWriteStream);
-    await (new Promise((resolve, reject) => {
+    await new Promise((resolve, reject) => {
         barWriteStream.on('end', () => resolve('end'));
         barWriteStream.on('finish', () => resolve('finish'));
         barWriteStream.on('error', (error) => reject(error));
-    }));
-    
+    });
+
     // Get a listing of the bar disk contents and store it on the foo disk.
     const s3Listing = await bar.list();
     await foo.write('s3listing.json', JSON.stringify(s3Listing, null, 2));
@@ -122,7 +122,7 @@ A disk that uses the local filesystem.
 #### Options:
 
 | Name   | Type   | Description                                                                                         |
-|--------|--------|-----------------------------------------------------------------------------------------------------|
+| ------ | ------ | --------------------------------------------------------------------------------------------------- |
 | `root` | string | Required; The absolute path to thee directory where files should be stored on the local filesystem. |
 
 ### S3
@@ -136,7 +136,7 @@ A disk that uses a remote AWS S3 bucket.
 #### Options:
 
 | Name           | Type   | Description                                                                                                               |
-|----------------|--------|---------------------------------------------------------------------------------------------------------------------------|
+| -------------- | ------ | ------------------------------------------------------------------------------------------------------------------------- |
 | `bucket`       | string | Required; The S3 bucket to use.                                                                                           |
 | `root`         | string | Optional; The prefix to use for storing objects in the bucket. Defaults to the root                                       |
 | `pagingLimit`  | number | Optional; Num of max results to fetch when paging through an S3 `listObjectsV2` call. Defaults to `1000`, the max.        |
@@ -179,4 +179,4 @@ for inline documentation and types.
 -   [ ] Document the `DiskManager` API
 -   [ ] Don't rely on `fs.readdir`'s `withFileTypes` so as to support all node 10 versions
 -   [ ] Write a `MemoryVolumeDisk` driver
--   [ ] Fix the `MemoryDisk` driver to accept and honor `root` like the `LocalDisk` does. 
+-   [ ] Fix the `MemoryDisk` driver to accept and honor `root` like the `LocalDisk` does.
