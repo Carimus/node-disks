@@ -180,3 +180,9 @@ for inline documentation and types.
 -   [ ] Don't rely on `fs.readdir`'s `withFileTypes` so as to support all node 10 versions
 -   [ ] Write a `MemoryVolumeDisk` driver
 -   [ ] Fix the `MemoryDisk` driver to accept and honor `root` like the `LocalDisk` does.
+
+## Development
+
+This project is based on the `carimus-node-ts-package-template`. Check out the
+[README and docs there](https://bitbucket.org/Carimus/carimus-node-ts-package-template/src/master/README.md)
+for more up to date information on the development process and tools available.
