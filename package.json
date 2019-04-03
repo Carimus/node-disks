@@ -9,8 +9,8 @@
         "prepublishOnly": "yarn run build",
         "test": "jest",
         "test:watch": "jest --watch",
-        "lint": "eslint '{src,__{tests,mocks}__,.}/**/*.{ts,tsx,js,jsx}' || true",
-        "pretty": "prettier --write '{src,__{tests,mocks}__,.}/**/*.{json,md,yml,ts,tsx,js,jsx}'",
+        "lint": "eslint '{*,{src,docs}/**/*,__{tests,mocks}__/**/*}.{ts,tsx,js,jsx}' || true",
+        "pretty": "prettier --write '{*,{src,docs}/**/*,__{tests,mocks}__/**/*}.{json,md,yml,ts,tsx,js,jsx}'",
         "fixcode": "yarn run pretty",
         "semantic-release": "semantic-release",
         "release": "yarn run semantic-release",
@@ -55,12 +55,12 @@
         }
     },
     "lint-staged": {
-        "{src,__{tests,mocks}__,.}/**/*.{ts,tsx,js,jsx}": [
+        "{*,{src,docs}/**/*,__{tests,mocks}__/**/*}.{ts,tsx,js,jsx}": [
             "prettier --write",
             "eslint",
             "git add"
         ],
-        "{src,docs,__{tests,mocks}__,.}/**/*.{json,md,yml}": [
+        "{*,{src,docs}/**/*,__{tests,mocks}__/**/*}.{json,md,yml}": [
             "prettier --write",
             "git add"
         ]
