@@ -33,9 +33,11 @@ It's recommended to setup a CI system to handle automatically pushing out builds
 1. Obtain the `carimus-deploy-bot` GitHub Personal Access Token and NPM Token and make note of
    these.
 2. Ensure the repository exists on GitHub
-3. Navigate to the repository and under Settings > Secrets add the following secrets:
-    - `GH_TOKEN`: the `carimus-deploy-bot` GitHub Personal Access Token
-    - `NPM_TOKEN`: the `carimus-deploy-bot` NPM Token
+3. Navigate to the repository on GitHub and update the settings:
+    1. Under Settings > Secrets add the following secrets:
+        - `GH_TOKEN`: the `carimus-deploy-bot` GitHub Personal Access Token
+        - `NPM_TOKEN`: the `carimus-deploy-bot` NPM Token
+    2. Under Settings > Collaborators & teams add `carimus-deploy-bot` as a collaborator with "Write" access.
 4. Rename `.github/main.example.workflow` to `.github/main.workflow`
 
 That's it! Pushes to `master` will trigger your build and release (only releasing if there were
