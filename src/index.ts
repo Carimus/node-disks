@@ -1,11 +1,19 @@
 import { DiskDriver } from './lib/types';
 import * as allErrors from './errors';
 
-export { DiskManager } from './lib/DiskManager';
-export { Disk } from './lib/Disk';
-export { S3Disk } from './drivers/s3/S3Disk';
-export { LocalDisk } from './drivers/local/LocalDisk';
-export { MemoryDisk } from './drivers/memory/MemoryDisk';
+export * from './lib/types';
+export * from './lib/fs/types';
+export * from './lib/DiskManager';
+export * from './lib/Disk';
+export * from './drivers/s3/S3Disk';
+export * from './drivers/s3/types';
+export * from './drivers/local/LocalDisk';
+export * from './drivers/local/types';
+export * from './drivers/memory/MemoryDisk';
+export * from './errors'
+export * from './'
+
+// Kept around for backwards compatibility.
 export const errors = allErrors;
 
 /**
