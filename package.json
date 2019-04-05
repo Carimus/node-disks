@@ -6,6 +6,7 @@
     "types": "dist/index.d.ts",
     "scripts": {
         "build": "rm -rf ./dist && tsc",
+        "watch": "yarn run build && npm-watch build",
         "prepublishOnly": "yarn run build",
         "test": "jest",
         "test:watch": "jest --watch",
@@ -16,6 +17,19 @@
         "release": "yarn run semantic-release",
         "release-ci": "echo 'unsafe-perm = true' > ./.npmrc && yarn run semantic-release && rm -rf ./.npmrc",
         "commit": "git-cz"
+    },
+    "watch": {
+        "build": {
+            "patterns": [
+                "src"
+            ],
+            "extensions": [
+                "ts",
+                "tsx",
+                "js",
+                "jsx"
+            ]
+        }
     },
     "repository": "https://github.com/Carimus/node-disks",
     "author": "Carimus",
@@ -53,6 +67,7 @@
         "jest": "^24.5.0",
         "lint-staged": "^8.1.5",
         "memfs": "^2.15.2",
+        "npm-watch": "^0.6.0",
         "prettier": "1.16.4",
         "semantic-release": "^15.13.3",
         "ts-jest": "^24.0.0",
