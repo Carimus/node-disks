@@ -157,6 +157,7 @@ Important public methods:
 -   `async createReadStream(path: string): Promise<Readable>` to obtain a readable stream to a file
 -   `async write(path: string, contents: Buffer): Promise<void>` to write to a file
 -   `async createReadStream(path: string): Promise<Writable>` to obtain a writable stream to a file
+-   `async delete(path: string): Promise<void>` to delete a file (not a directory)
 -   `async list(path: string): Promise<DiskListingObject[]>` to obtain a list of objects in a
     directory on the disk.
 
@@ -180,6 +181,8 @@ for inline documentation and types.
 -   [ ] Don't rely on `fs.readdir`'s `withFileTypes` so as to support all node 10 versions
 -   [ ] Write a `MemoryVolumeDisk` driver
 -   [ ] Fix the `MemoryDisk` driver to accept and honor `root` like the `LocalDisk` does.
+-   [ ] Support `rimraf` for directories
+-   [ ] Fix `FSDisk` (backend to `MemoryDisk` and `LocalDisk`) to `mkdirp` path to file to mirror s3 behaviour
 
 ## Development
 
