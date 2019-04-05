@@ -2,8 +2,11 @@
 
 set -e
 
-# Update the package.json to place the build command in prepublishOnly instead of in postinstall
-json -I -f package.json -e 'this.scripts.prepublishOnly = "yarn run build"; delete this.scripts.postinstall;'
+# Update the package.json to remove prepack command.
+json -I -f package.json -e 'delete this.scripts.prepack;'
 
 # Pretty up the package.json so it's still consistent with the codebase's code style
 prettier --write package.json
+
+# Run the build to get ./dist output
+yarn run build
