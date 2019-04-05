@@ -15,7 +15,7 @@
         "release": "yarn run semantic-release",
         "release-ci": "echo 'unsafe-perm = true' > ./.npmrc && yarn run semantic-release && rm -rf ./.npmrc",
         "commit": "git-cz",
-        "postinstall": "yarn run build && echo 'Postinstall build command is replaced with prepublishOnly during semantic-release publish prep.'"
+        "prepack": "yarn --ignore-scripts && yarn run build && echo 'Prepack dev build command is removed during semantic-release publish prep.'"
     },
     "repository": "https://bitbucket.org/Carimus/carimus-node-ts-package-template",
     "author": "Carimus",

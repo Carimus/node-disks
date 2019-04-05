@@ -8,7 +8,8 @@ re-usable library on npm.
 -   Jest for unit testing
 -   Precommit linting
 -   Precommit formatting via [Prettier](https://prettier.io)
--   Prepublish TypeScript build for distribution on npm
+-   Prepare script for TypeScript build for distribution on npm
+-   Prepack build command for TypeScript build to allow installation direct from GitHub
 -   Ready-to-use GitHub Actions workflow for releasing on push to `master`
 
 ## Using this Template
