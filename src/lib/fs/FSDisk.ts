@@ -34,6 +34,8 @@ export abstract class FSDisk extends Disk {
 
     protected stat: (path: string) => Promise<Stats>;
 
+    protected unlink: (path: string) => Promise<void>;
+
     public constructor(config: DiskConfig) {
         super(config);
         // Set the fs module to use internally
@@ -49,6 +51,7 @@ export abstract class FSDisk extends Disk {
             });
         };
         this.stat = promisify(this.fs.stat);
+        this.unlink = promisify(this.fs.unlink);
     }
 
     /**
@@ -162,6 +165,22 @@ export abstract class FSDisk extends Disk {
         } catch (error) {
             if (error.code === 'EISDIR') {
                 throw new NotWritableDestinationError(pathOnDisk);
+            }
+            throw error;
+        }
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public async delete(path: string): Promise<void> {
+        try {
+            await this.unlink(path);
+        } catch (error) {
+            if (error.code === 'EISDIR' || error.code === 'EPERM') {
+                throw new NotAFileError(path);
+            } else if (error.code === 'ENOENT') {
+                throw new NotFoundError(path);
             }
             throw error;
         }

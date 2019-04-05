@@ -1,5 +1,5 @@
 import { FSDisk } from '../../lib/fs/FSDisk';
-import { FSModule } from '../../lib/fs/types';
+import { FSModule } from '../..';
 import VError = require('verror');
 
 export class MemoryDisk extends FSDisk {

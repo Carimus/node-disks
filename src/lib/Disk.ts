@@ -94,6 +94,13 @@ export abstract class Disk {
     abstract async createWriteStream(path: string): Promise<stream.Writable>;
 
     /**
+     * Delete a file on the disk.
+     *
+     * @param path
+     */
+    abstract async delete(path: string): Promise<void>;
+
+    /**
      * List the files and directories in a specific directory on the disk (or the root if not
      * specified).
      *

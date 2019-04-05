@@ -192,7 +192,7 @@ export class S3Disk extends Disk {
      *
      * @param params
      */
-    private async objectParamsMatchDirectoryObject(
+    private async doObjectParamsMatchDirectoryObject(
         params: S3ObjectParams,
     ): Promise<boolean> {
         if (params.Key.endsWith('/')) {
@@ -240,7 +240,7 @@ export class S3Disk extends Disk {
         body: string | Buffer | Readable,
     ): Promise<void> {
         const params = this.getPutObjectParams(path);
-        if (await this.objectParamsMatchDirectoryObject(params)) {
+        if (await this.doObjectParamsMatchDirectoryObject(params)) {
             throw new NotWritableDestinationError(path);
         }
         await this.s3Client
@@ -260,6 +260,28 @@ export class S3Disk extends Disk {
             'The s3 driver does not support direct write streams. ' +
                 'Instead pass a ReadableStream as the body to `write`.',
         );
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public async delete(path: string): Promise<void> {
+        const params = this.getObjectParams(path);
+        // Don't allow the deletion of directory markers.
+        if (params.Key.endsWith('/')) {
+            throw new NotAFileError(path);
+        }
+        try {
+            // HEAD the object which will fail if the object doesn't exist.
+            await this.s3Client.headObject(params).promise();
+            // It does exist so we delete it.
+            await this.s3Client.deleteObject(params).promise();
+        } catch (error) {
+            if (error.code === 'NotFound') {
+                throw new NotFoundError(path);
+            }
+            throw error;
+        }
     }
 
     /**

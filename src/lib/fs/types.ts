@@ -7,4 +7,5 @@ export interface FSModule {
     stat: typeof fs.stat;
     createReadStream: typeof fs.createReadStream;
     createWriteStream: typeof fs.createWriteStream;
+    unlink: typeof fs.unlink;
 }
