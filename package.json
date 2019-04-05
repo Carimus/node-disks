@@ -6,7 +6,6 @@
     "types": "dist/index.d.ts",
     "scripts": {
         "build": "rm -rf ./dist && tsc",
-        "postinstall": "yarn run build && echo 'Postinstall build command is replaced with prepublishOnly during semantic-release publish prep.'",
         "test": "jest",
         "test:watch": "jest --watch",
         "lint": "eslint '{*,{src,docs}/**/*,__{tests,mocks}__/**/*}.{ts,tsx,js,jsx}' || true",
@@ -15,7 +14,8 @@
         "semantic-release": "semantic-release",
         "release": "yarn run semantic-release",
         "release-ci": "echo 'unsafe-perm = true' > ./.npmrc && yarn run semantic-release && rm -rf ./.npmrc",
-        "commit": "git-cz"
+        "commit": "git-cz",
+        "postinstall": "yarn run build && echo 'Postinstall build command is replaced with prepublishOnly during semantic-release publish prep.'"
     },
     "repository": "https://bitbucket.org/Carimus/carimus-node-ts-package-template",
     "author": "Carimus",

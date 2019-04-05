@@ -4,4 +4,4 @@
 json -I -f package.json -e 'this.scripts.prepublishOnly = "yarn run build"; delete this.scripts.postinstall;'
 
 # Pretty up the package.json so it's still consistent with the codebase's code style
-pretty --write package.json
+prettier --write package.json
