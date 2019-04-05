@@ -6,7 +6,6 @@
     "types": "dist/index.d.ts",
     "scripts": {
         "build": "rm -rf ./dist && tsc",
-        "prepublishOnly": "yarn run build",
         "test": "jest",
         "test:watch": "jest --watch",
         "lint": "eslint '{*,{src,docs}/**/*,__{tests,mocks}__/**/*}.{ts,tsx,js,jsx}' || true",
@@ -15,7 +14,8 @@
         "semantic-release": "semantic-release",
         "release": "yarn run semantic-release",
         "release-ci": "echo 'unsafe-perm = true' > ./.npmrc && yarn run semantic-release && rm -rf ./.npmrc",
-        "commit": "git-cz"
+        "commit": "git-cz",
+        "postinstall": "yarn run build && echo 'Postinstall build command is replaced with prepublishOnly during semantic-release publish prep.'"
     },
     "repository": "https://github.com/Carimus/node-disks",
     "author": "Carimus",
@@ -33,6 +33,7 @@
     "devDependencies": {
         "@commitlint/cli": "^7.5.2",
         "@commitlint/config-conventional": "^7.5.0",
+        "@semantic-release/exec": "^3.3.2",
         "@types/jest": "^24.0.11",
         "@types/ramda": "types/npm-ramda#dist",
         "@types/stream-to-array": "^2.3.0",
@@ -51,6 +52,7 @@
         "eslint-plugin-standard": ">=4.0.0",
         "husky": "^1.3.1",
         "jest": "^24.5.0",
+        "json": "^9.0.6",
         "lint-staged": "^8.1.5",
         "memfs": "^2.15.2",
         "prettier": "1.16.4",
@@ -60,6 +62,21 @@
     },
     "engines": {
         "node": ">=10.10"
+    },
+    "release": {
+        "branch": "master",
+        "plugins": [
+            "@semantic-release/commit-analyzer",
+            "@semantic-release/release-notes-generator",
+            [
+                "@semantic-release/exec",
+                {
+                    "prepareCmd": "./scripts/prepare.sh"
+                }
+            ],
+            "@semantic-release/npm",
+            "@semantic-release/github"
+        ]
     },
     "husky": {
         "hooks": {
