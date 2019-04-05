@@ -175,14 +175,19 @@ for inline documentation and types.
 
 ## TODO
 
--   [ ] Tests
--   [ ] Document the `Disk` API
--   [ ] Document the `DiskManager` API
--   [ ] Don't rely on `fs.readdir`'s `withFileTypes` so as to support all node 10 versions
--   [ ] Write a `MemoryVolumeDisk` driver
+-   [ ] Write tests for `S3Disk`.
+-   [ ] Write tests for `LocalDisk`.
+-   [ ] Write tests for `MemoryDisk`.
+-   [ ] Document the `Disk` API.
+-   [ ] Document the `DiskManager` API.
+-   [ ] Don't rely on `fs.readdir`'s `withFileTypes` so as to support all node 10 versions.
+-   [ ] Write a `MemoryVolumeDisk` driver.
 -   [ ] Fix the `MemoryDisk` driver to accept and honor `root` like the `LocalDisk` does.
--   [ ] Support `rimraf` for directories
--   [ ] Fix `FSDisk` (backend to `MemoryDisk` and `LocalDisk`) to `mkdirp` path to file to mirror s3 behaviour
+-   [ ] Support `rimraf` for directories.
+-   [ ] Fix `FSDisk` (backend to `MemoryDisk` and `LocalDisk`) to `mkdirp` path to file to mirror s3 behaviour.
+-   [ ] When a file is deleted on `FSDisk` and its the only file in the directory, delete the directory, following the
+        path backwards to do the same to get rid of all fs tree leaves.
+-   [ ] Support `force` for delete which doesn't to mimic `rm -f` which doesn't fail if the file isn't found.
 
 ## Development
 
