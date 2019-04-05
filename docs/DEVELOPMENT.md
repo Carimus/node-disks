@@ -15,6 +15,36 @@ yarn
 
 to install all of the necessary dependencies and tools.
 
+## Linking
+
+If you're updating this package in order to implement a new feature in another codebase that depends on this package,
+you can locally symlink this package into the other codebase's `node_modules` and use the watch script in this package
+to rebuild whenever you change files.
+
+Run the following in this package's root to have yarn create and track a link to this package locally:
+
+```
+yarn link
+```
+
+Then run the following to start the watcher that rebuilds whenever you change files:
+
+```
+yarn run watch
+```
+
+**Important Note:** if you install new dependencies, that will not trigger the watcher to rebuild for performance
+reasons. Either restart the watch command manually or edit a source file (i.e. import the new package) to trigger
+a rebuild.
+
+Finally in another terminal **in the other codebase** that depends on this package, simply run
+
+```
+yarn link @carimus/this-package
+```
+
+where `@carimus/this-package` is the name in `package.json` for this package.
+
 ## Commit Messages
 
 This package uses [`semantic-release`](https://github.com/semantic-release/semantic-release) to

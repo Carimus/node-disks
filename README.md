@@ -9,6 +9,7 @@ re-usable library on npm.
 -   Precommit linting
 -   Precommit formatting via [Prettier](https://prettier.io)
 -   Prepublish TypeScript build for distribution on npm
+-   Watch script for rebuilding on file changes (useful with `yarn link`; see development instructions)
 -   Ready-to-use GitHub Actions workflow for releasing on push to `master`
 
 ## Using this Template
