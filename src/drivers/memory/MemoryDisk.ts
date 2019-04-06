@@ -1,22 +1,23 @@
 import { FSDisk } from '../../lib/fs/FSDisk';
-import { FSModule } from '../..';
+import { AsyncFSModule } from '../..';
+import { VolumeFSModule } from './VolumeFSModule';
 import VError = require('verror');
 
 export class MemoryDisk extends FSDisk {
     /**
      * Return an in-memory volume using memfs.
      */
-    protected getFSModule(): FSModule {
-        let fs = null;
+    protected getAsyncFsModule(): AsyncFSModule {
+        let Volume = null;
         try {
-            fs = require('memfs').fs;
+            Volume = require('memfs').Volume;
         } catch (error) {
             throw new VError(
                 error,
-                'Failed to import memfs. Ensure it is installed if you wish to use the Memory disk driver.',
+                'Failed to import memfs. Ensure the correct version is installed if you wish to use the Memory disk driver.',
             );
         }
-        return fs;
+        return new VolumeFSModule(new Volume());
     }
 
     /**

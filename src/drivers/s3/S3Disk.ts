@@ -1,6 +1,6 @@
 import * as AWS from 'aws-sdk';
 import { Readable, Writable } from 'stream';
-import { Disk } from '../..';
+import { Disk, DiskListingObject, DiskObjectType } from '../..';
 import {
     NotAFileError,
     NotFoundError,
@@ -13,8 +13,7 @@ import {
     S3NodeBody,
     S3ObjectParams,
 } from './types';
-import { DiskListingObject, DiskObjectType } from '../../lib/types';
-import toArray = require('stream-to-array');
+import { streamToBuffer } from '../../lib/utils';
 
 /**
  * Represents a remote AWS S3 disk.
@@ -153,13 +152,7 @@ export class S3Disk extends Disk {
                 return body;
             } else if (body instanceof Readable) {
                 // If AWS returned a Readable stream for whatever reason, read it into a buffer and then return that.
-                const streamParts = await toArray(body);
-                const streamBuffers: Buffer[] = streamParts.map(
-                    (part: ArrayBuffer | SharedArrayBuffer): Buffer => {
-                        return Buffer.isBuffer(part) ? part : Buffer.from(part);
-                    },
-                );
-                return Buffer.concat(streamBuffers);
+                return streamToBuffer(body);
             }
         }
 

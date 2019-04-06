@@ -1,8 +1,8 @@
 import * as path from 'path';
-import * as fs from 'fs';
+import * as fse from 'fs-extra';
 import { LocalDiskConfig } from './types';
 import { FSDisk } from '../../lib/fs/FSDisk';
-import { FSModule } from '../../lib/fs/types';
+import { AsyncFSModule } from '../..';
 
 /**
  * Used to cache the calculated root path without conflicts.
@@ -32,10 +32,10 @@ export class LocalDisk extends FSDisk {
     protected config!: LocalDiskConfig;
 
     /**
-     * Use the built-in node `fs` module for the local disk
+     * Use the fs-extras which already includes all of the promisified node fs methods and mkdirp
      */
-    protected getFSModule(): FSModule {
-        return fs;
+    protected getAsyncFsModule(): AsyncFSModule {
+        return fse;
     }
 
     /**

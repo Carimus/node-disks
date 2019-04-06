@@ -1,4 +1,4 @@
-import { DiskConfig } from '../../lib/types';
+import { DiskConfig } from '../..';
 
 export interface LocalDiskConfig extends DiskConfig {
     /**

@@ -1,7 +1,6 @@
 import * as path from 'path';
-import { Dirent, Stats } from 'fs';
+import { Stats } from 'fs';
 import { Readable, Writable } from 'stream';
-import { promisify } from 'util';
 import { Disk } from '../Disk';
 import {
     NotADirectoryError,
@@ -10,11 +9,12 @@ import {
     NotWritableDestinationError,
 } from '../../errors';
 import { DiskConfig, DiskListingObject, DiskObjectType } from '../types';
-import { FSModule } from './types';
+import { AsyncFSModule } from './types';
+import { pipeStreams, streamToBuffer } from '../utils';
 
 /**
- * Represents a disk that uses a traditional filesystem. Expects an `fs` module to be provided that implements
- * node's `fs` module's API. In practice this either _is_ the node `fs` module or it's the `memfs`' `fs` module.
+ * Represents a disk that uses a traditional filesystem. Expects an `AsyncFSModule` which is essentially just
+ * a subset `fs` core functions but simplified and promisified.
  *
  * Will ignore any filesystem entities that are not directories, files, or symbolic links. Symbolic
  * links will be resolved and if they don't resolve to a file or directory will also be ignored;
@@ -22,42 +22,20 @@ import { FSModule } from './types';
  */
 export abstract class FSDisk extends Disk {
     /**
-     * The fs module implementation to use.
+     * The async fs module implementation to use which includes the already promisified fs methods.
      */
-    protected fs: FSModule;
-
-    protected writeFile: (path: string, body: Buffer) => Promise<void>;
-
-    protected readFile: (path: string) => Promise<Buffer>;
-
-    protected readDir: (path: string) => Promise<Dirent[]>;
-
-    protected stat: (path: string) => Promise<Stats>;
-
-    protected unlink: (path: string) => Promise<void>;
+    protected fs: AsyncFSModule;
 
     public constructor(config: DiskConfig) {
         super(config);
         // Set the fs module to use internally
-        this.fs = this.getFSModule();
-        // Promisify the fs module methods that don't return promises or streams
-        this.writeFile = promisify(this.fs.writeFile);
-        this.readFile = promisify(this.fs.readFile);
-        const readdir = promisify(this.fs.readdir);
-        // Our copy of readdir -> readDir will automatically use Node 10.10+ withFileTypes.
-        this.readDir = (path: string): Promise<Dirent[]> => {
-            return readdir(path, {
-                withFileTypes: true,
-            });
-        };
-        this.stat = promisify(this.fs.stat);
-        this.unlink = promisify(this.fs.unlink);
+        this.fs = this.getAsyncFsModule();
     }
 
     /**
      * Should return the FS module to use. Must implement the same public API as the node `fs` module.
      */
-    protected abstract getFSModule(): FSModule;
+    protected abstract getAsyncFsModule(): AsyncFSModule;
 
     /**
      * Get the absolute root path on the filesystem. By default this is literally the root of the filesystem.
@@ -96,7 +74,7 @@ export abstract class FSDisk extends Disk {
         // We stat first because createReadStream will create a file if it doesn't already exist.
         let stats = null;
         try {
-            stats = await this.stat(fullPath);
+            stats = await this.fs.stat(fullPath);
         } catch (error) {
             if (error.code === 'ENOENT') {
                 throw new NotFoundError(pathOnDisk);
@@ -118,7 +96,7 @@ export abstract class FSDisk extends Disk {
         const fullPath = this.getFullPath(pathOnDisk);
         let stats = null;
         try {
-            stats = await this.stat(fullPath);
+            stats = await this.fs.stat(fullPath);
         } catch (error) {
             if (error.code !== 'ENOENT') {
                 // If the file doesn't exists, that's good! Continue. Otherwise throw.
@@ -145,7 +123,7 @@ export abstract class FSDisk extends Disk {
      */
     public async read(pathOnDisk: string): Promise<Buffer> {
         try {
-            return await this.readFile(this.getFullPath(pathOnDisk));
+            return await this.fs.readFile(this.getFullPath(pathOnDisk));
         } catch (error) {
             if (error.code === 'EISDIR') {
                 throw new NotAFileError(pathOnDisk);
@@ -159,9 +137,18 @@ export abstract class FSDisk extends Disk {
     /**
      * @inheritDoc
      */
-    public async write(pathOnDisk: string, body: Buffer): Promise<void> {
+    public async write(
+        pathOnDisk: string,
+        body: Buffer | string | Readable,
+    ): Promise<void> {
         try {
-            return await this.writeFile(this.getFullPath(pathOnDisk), body);
+            if (typeof body === 'object' && body instanceof Readable) {
+                // If we were provided with a stream, we'll delegate to `createWriteStream`
+                const writeStream = await this.createWriteStream(pathOnDisk);
+                await pipeStreams(body, writeStream);
+            } else {
+                await this.fs.writeFile(this.getFullPath(pathOnDisk), body);
+            }
         } catch (error) {
             if (error.code === 'EISDIR') {
                 throw new NotWritableDestinationError(pathOnDisk);
@@ -174,8 +161,9 @@ export abstract class FSDisk extends Disk {
      * @inheritDoc
      */
     public async delete(path: string): Promise<void> {
+        const fullPath = this.getFullPath(path);
         try {
-            await this.unlink(path);
+            await this.fs.unlink(fullPath);
         } catch (error) {
             if (error.code === 'EISDIR' || error.code === 'EPERM') {
                 throw new NotAFileError(path);
@@ -194,10 +182,10 @@ export abstract class FSDisk extends Disk {
     ): Promise<DiskListingObject[]> {
         const fullPath = this.getFullPath(pathToDirectoryOnDisk);
 
-        let directoryEntities = null;
+        let directoryFilenames = null;
         try {
             // Get a full directory listing
-            directoryEntities = await this.readDir(fullPath);
+            directoryFilenames = await this.fs.readdir(fullPath);
         } catch (error) {
             if (error.code === 'ENOTDIR') {
                 throw new NotADirectoryError(pathToDirectoryOnDisk);
@@ -207,6 +195,28 @@ export abstract class FSDisk extends Disk {
             throw error;
         }
 
+        // Resolve the filenames in the listing down to stats about each file.
+        const pendingListings: ([
+            string,
+            Promise<Stats>
+        ])[] = directoryFilenames.reduce(
+            (promises: ([string, Promise<Stats>])[], filename: string) => {
+                try {
+                    promises.push([
+                        filename,
+                        this.fs.stat(path.resolve(fullPath, filename)),
+                    ]);
+                } catch (error) {
+                    if (error.code !== 'ENOENT') {
+                        // We simply exclude unresolvable symlinks from the listing.
+                        throw error;
+                    }
+                }
+                return promises;
+            },
+            [],
+        );
+
         /*
          * We loop through all of the directory listings and replace all of the listing with
          * objects that indicate name and type as long as the listing is a file or directory or
@@ -214,52 +224,33 @@ export abstract class FSDisk extends Disk {
          * null and just skip over them when we reduce this later. Note also the we append the
          * directory separator onto the end of directories as is the `Disk` standard.
          */
-        const rawDirectoryEntitiesOrStats: (DiskListingObject | null)[] = await Promise.all(
-            directoryEntities.map(
-                async (entity: Dirent): Promise<DiskListingObject | null> => {
-                    if (entity.isSymbolicLink()) {
-                        try {
-                            const linkStats: Stats = await this.stat(
-                                path.resolve(fullPath, entity.name),
-                            );
-                            if (linkStats.isFile()) {
-                                return {
-                                    type: DiskObjectType.File,
-                                    name: entity.name,
-                                };
-                            } else if (linkStats.isDirectory()) {
-                                return {
-                                    type: DiskObjectType.Directory,
-                                    name: `${entity.name}${Disk.SEP}`,
-                                };
-                            }
-                        } catch (error) {
-                            if (error.code !== 'ENOENT') {
-                                // We simply exclude unresolvable symlinks from the listing.
-                                throw error;
-                            }
-                        }
-                    } else if (entity.isDirectory()) {
+        const rawListings: (DiskListingObject | null)[] = await Promise.all(
+            pendingListings.map(
+                async (
+                    pendingListing: [string, Promise<Stats>],
+                ): Promise<DiskListingObject | null> => {
+                    const [name, fileStatsPromise] = pendingListing;
+                    const stats: Stats = await fileStatsPromise;
+
+                    if (stats.isDirectory()) {
                         return {
                             type: DiskObjectType.Directory,
-                            name: `${entity.name}${Disk.SEP}`,
+                            name: `${name}${Disk.SEP}`,
                         };
-                    } else if (entity.isFile()) {
+                    } else if (stats.isFile()) {
                         return {
-                            type: DiskObjectType.Directory,
-                            name: entity.name,
+                            type: DiskObjectType.File,
+                            name,
                         };
                     }
+
                     return null;
                 },
             ),
         );
 
         // Next we separate out files from directories so that we can list directories first
-        const {
-            directories = [],
-            files = [],
-        } = rawDirectoryEntitiesOrStats.reduce(
+        const { directories = [], files = [] } = rawListings.reduce(
             (
                 listings: {
                     directories: DiskListingObject[];

@@ -5,7 +5,7 @@ FlySystem.
 
 ## Prerequisites
 
--   Node >= 10.10 (requires support for `withFileTypes` in `fs.readdir`)
+-   Node >= 10
 
 ## Getting Started
 
@@ -33,10 +33,10 @@ available `Disk` methods to perform operations.
 For example (in typescript):
 
 ```typescript
-import { Disk, LocalDisk, S3Disk } from '@carimus/node-disks';
+import { Disk, LocalDisk, S3Disk, DiskDriver } from '@carimus/node-disks';
 
-const foo: Disk = new LocalDisk({ root: '/tmp' });
-const bar: Disk = new S3Disk({ bucket: 'test' });
+const foo: Disk = new LocalDisk({ driver: DiskDriver.Local, root: '/tmp' });
+const bar: Disk = new S3Disk({ driver: DiskDriver.S3, bucket: 'test' });
 
 // Wrap everything in a self-executing async function.
 (async () => {
@@ -61,6 +61,10 @@ const bar: Disk = new S3Disk({ bucket: 'test' });
 })();
 ```
 
+**Important Note:** Providing `driver` to the `LocalDisk` and `S3Disk` constructors isn't functionally
+necessary; it's necessary only to satisfy typescript right now until we separate the driver from the options since
+the driver is only a concern of the `DiskManager`.
+
 ### Option B: Use a Disk Manager
 
 `node-disks` also ships with a `DiskManager` that you can provide a single, declarative
@@ -70,16 +74,16 @@ For example, considering the two disks in **Option A** below, we could have inst
 done:
 
 ```typescript
-import { DiskManager, Disk } from '@carimus/node-disks';
+import { DiskManager, Disk, DiskDriver } from '@carimus/node-disks';
 
 const diskManager = new DiskManager({
     default: 'foo',
     foo: {
-        driver: 'local',
+        driver: DiskDriver.Local,
         root: '/tmp',
     },
     bar: {
-        driver: 's3',
+        driver: DiskDriver.S3,
         bucket: 'test',
     },
     baz: 'bar', // You can alias disks as well! `default` above is an alias.
@@ -99,15 +103,10 @@ const bar: Disk = diskManager.getDisk('bar');
 
 **`Disk` class:** `MemoryDisk`
 
-An in-memory disk whose contents will be forgotten when the node process ends.
+An in-memory disk whose contents will be forgotten when the node process ends. Each instance of the `MemoryDisk` has
+its own isolated filesystem.
 
-**Warning:** Currently this driver uses a global in-memory disk. Multiple instances using this
-driver will share the same in-memory filesystem. This is on the roadmap to be fixed by allowing
-a `root` option to be specified just like with the local disk. Additionally there is the possibility
-to add a `MemoryVolumeDisk` that uses [`memfs`](https://github.com/streamich/memfs)'s `Volume` which
-gives each instance its own in memory filesystem isolated from all others.
-
-#### Optoins
+#### Options
 
 Takes no options.
 
@@ -175,19 +174,24 @@ for inline documentation and types.
 
 ## TODO
 
--   [ ] Write tests for `S3Disk`.
--   [ ] Write tests for `LocalDisk`.
--   [ ] Write tests for `MemoryDisk`.
+-   [ ] Make the `MemoryDisk` test generic to run on any `Disk` and figure out how to run it safely with `LocalDisk`
+        and `S3Disk`: - `S3Disk`: credentials and bucket from environment with cleanup `afterEach` and don't fail if
+        env variables aren't there. - `LocalDisk`: just randomly generate a path to a tmp directory that doesn't
+        exist in `beforeEach` and use that as the disk root and rimraf it in `afterEach`
+-   [ ] Improve tests to cover niche cases like:
+    -   `Readable` stream passed to `MemoryDisk`/`LocalDisk`
+    -   Properly handled symlinks in directory listings for `MemoryDisk`/`LocalDisk`
+    -   Proper errors from bad permissions for `MemoryDisk`/`LocalDisk`
 -   [ ] Document the `Disk` API.
 -   [ ] Document the `DiskManager` API.
--   [ ] Don't rely on `fs.readdir`'s `withFileTypes` so as to support all node 10 versions.
--   [ ] Write a `MemoryVolumeDisk` driver.
--   [ ] Fix the `MemoryDisk` driver to accept and honor `root` like the `LocalDisk` does.
 -   [ ] Support `rimraf` for directories.
 -   [ ] Fix `FSDisk` (backend to `MemoryDisk` and `LocalDisk`) to `mkdirp` path to file to mirror s3 behaviour.
 -   [ ] When a file is deleted on `FSDisk` and its the only file in the directory, delete the directory, following the
         path backwards to do the same to get rid of all fs tree leaves.
 -   [ ] Support `force` for delete which doesn't to mimic `rm -f` which doesn't fail if the file isn't found.
+-   [ ] Separate driver from remaining options so that the `driver` options doesn't have to be passed to `*Disk`
+        constructors.
+-   [ ] Wrap all unknown errors in an `UnknownDiskError` (maybe using `VError`?)
 
 ## Development
 
