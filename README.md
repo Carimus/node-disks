@@ -175,9 +175,11 @@ for inline documentation and types.
 ## TODO
 
 -   [ ] Make the `MemoryDisk` test generic to run on any `Disk` and figure out how to run it safely with `LocalDisk`
-        and `S3Disk`: - `S3Disk`: credentials and bucket from environment with cleanup `afterEach` and don't fail if
-        env variables aren't there. - `LocalDisk`: just randomly generate a path to a tmp directory that doesn't
-        exist in `beforeEach` and use that as the disk root and rimraf it in `afterEach`
+        and `S3Disk`:
+    -   `S3Disk`: credentials and bucket from environment with cleanup `afterEach` and don't fail if env variables
+        aren't there.
+    -   `LocalDisk`: just randomly generate a path to a tmp directory that doesn't exist in `beforeEach` and use that
+        as the disk root and rimraf it in `afterEach`
 -   [ ] Improve tests to cover niche cases like:
     -   `Readable` stream passed to `MemoryDisk`/`LocalDisk`
     -   Properly handled symlinks in directory listings for `MemoryDisk`/`LocalDisk`
