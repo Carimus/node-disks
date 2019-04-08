@@ -7,11 +7,20 @@ import {
     DiskManagerConfig,
     DiskManagerOptions,
 } from './types';
-import { S3Disk, LocalDisk, MemoryDisk } from '..';
-import { S3DiskConfig } from '../drivers/s3/types';
-import { LocalDiskConfig } from '../drivers/local/types';
+import {
+    S3Disk,
+    LocalDisk,
+    MemoryDisk,
+    S3DiskConfig,
+    LocalDiskConfig,
+} from '..';
 
-export type AnyDiskConfig = DiskConfig | S3DiskConfig | LocalDiskConfig | null;
+export type AnyDiskConfig = DiskConfig | S3DiskConfig | LocalDiskConfig;
+
+export interface AnyNamedDiskConfig {
+    name: string;
+    config: AnyDiskConfig;
+}
 
 export interface DiskManagerDiskRegistry {
     [key: string]: Disk;
@@ -43,12 +52,12 @@ export class DiskManager {
      * @param name The name of the disk to lookup in the config.
      * @param maxLookup The max number of times to recurse to avoid infinite
      *      loops when resolving aliases.
-     * @returns The disk config or null if it couldn't be resolved.
+     * @returns The disk config or null if it couldn't be resolved along with the finally resolved name.
      */
     public resolveDiskConfig = (
         name: string,
         maxLookup: number = 10,
-    ): AnyDiskConfig => {
+    ): AnyNamedDiskConfig | null => {
         if (has(name, this.config) && maxLookup > 0) {
             // If the value of the disk in config is a string, assume it's an alias.
             return typeof this.config[name] === 'string'
@@ -56,7 +65,7 @@ export class DiskManager {
                       this.config[name] as string,
                       maxLookup - 1,
                   )
-                : (this.config[name] as DiskConfig);
+                : { name, config: this.config[name] as DiskConfig };
         }
         return null;
     };
@@ -85,28 +94,46 @@ export class DiskManager {
         name: string = 'default',
         options: DiskManagerOptions = {},
     ): Disk => {
-        if (has(name, this.disks)) {
-            return this.disks[name];
-        }
-        const { s3Client = null } = options;
-        const diskConfig: AnyDiskConfig = this.resolveDiskConfig(name);
-        if (diskConfig) {
-            const { driver = null } = diskConfig;
-            switch (driver) {
-                case DiskDriver.Local:
-                    return this.registerDisk(
-                        name,
-                        new LocalDisk(diskConfig as LocalDiskConfig),
-                    );
-                case DiskDriver.Memory:
-                    return this.registerDisk(name, new MemoryDisk(diskConfig));
-                case DiskDriver.S3:
-                    return this.registerDisk(
-                        name,
-                        new S3Disk(diskConfig as S3DiskConfig, s3Client),
-                    );
-                default:
-                    throw new BadDriverError(name, driver);
+        const namedDiskConfig = this.resolveDiskConfig(name);
+        if (namedDiskConfig) {
+            const { name: resolvedName, config: diskConfig } = namedDiskConfig;
+            if (has(resolvedName, this.disks)) {
+                return this.disks[resolvedName];
+            }
+            const { s3Client = null } = options;
+            if (diskConfig) {
+                const { driver = null } = diskConfig;
+                switch (driver) {
+                    case DiskDriver.Local:
+                        return this.registerDisk(
+                            resolvedName,
+                            new LocalDisk(
+                                diskConfig as LocalDiskConfig,
+                                resolvedName,
+                            ),
+                        );
+                    case DiskDriver.Memory:
+                        return this.registerDisk(
+                            resolvedName,
+                            new MemoryDisk(diskConfig, resolvedName),
+                        );
+                    case DiskDriver.S3:
+                        return this.registerDisk(
+                            resolvedName,
+                            s3Client
+                                ? new S3Disk(
+                                      diskConfig as S3DiskConfig,
+                                      resolvedName,
+                                      s3Client,
+                                  )
+                                : new S3Disk(
+                                      diskConfig as S3DiskConfig,
+                                      resolvedName,
+                                  ),
+                        );
+                    default:
+                        throw new BadDriverError(resolvedName, driver);
+                }
             }
         }
         throw new DiskNotFoundError(name);

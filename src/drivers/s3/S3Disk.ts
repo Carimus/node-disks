@@ -37,10 +37,11 @@ export class S3Disk extends Disk {
     /**
      * Create the disk, optionally using an existing S3 client
      * @param config
+     * @param name
      * @param s3Client
      */
-    public constructor(config: S3DiskConfig, s3Client: AWS.S3 | null = null) {
-        super(config);
+    public constructor(config: S3DiskConfig, name?: string, s3Client?: AWS.S3) {
+        super(config, name);
         const { clientConfig = {}, bucket = null } = config;
         if (!bucket) {
             throw new Error('Missing config value `bucket` for `s3` disk.');

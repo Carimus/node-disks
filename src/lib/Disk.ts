@@ -44,10 +44,24 @@ export abstract class Disk {
     protected config: DiskConfig;
 
     /**
-     * @param config The disk's configuration.
+     * The optional name of the disk for organizational use.
      */
-    public constructor(config: DiskConfig) {
+    protected name: string | null;
+
+    /**
+     * @param config The disk's configuration.
+     * @param name The optional name of the disk for organizational use.
+     */
+    protected constructor(config: DiskConfig, name?: string) {
         this.config = config;
+        this.name = name || null;
+    }
+
+    /**
+     * Get the optional name of the disk.
+     */
+    public getName(): string | null {
+        return this.name;
     }
 
     /**

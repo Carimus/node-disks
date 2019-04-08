@@ -159,6 +159,8 @@ Important public methods:
 -   `async delete(path: string): Promise<void>` to delete a file (not a directory)
 -   `async list(path: string): Promise<DiskListingObject[]>` to obtain a list of objects in a
     directory on the disk.
+-   `getName(): string | null` to get the name of the disk if it was created with one. The `DiskManager` will
+    automatically and appropriately set this to the actual resolved name of the disk from the config.
 
 ### `DiskManager`
 
