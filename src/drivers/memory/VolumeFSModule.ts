@@ -93,7 +93,7 @@ export class VolumeFSModule implements AsyncFSModule {
                     if (error) {
                         reject(error);
                     } else if (data && Array.isArray(data)) {
-                        // Use `as` here to force
+                        // transformVolumeDataToString can handle any TDataOut or Dirent even when mixed
                         const results: string[] = (data as (
                             | TDataOut
                             | Dirent)[]).map(transformVolumeDataToString);
@@ -139,6 +139,24 @@ export class VolumeFSModule implements AsyncFSModule {
                     resolve(stats as fs.Stats);
                 }
             });
+        });
+    }
+
+    public access(path: string, mode?: number): Promise<void> {
+        return new Promise((resolve, reject) => {
+            const fulfill = (error?: IError): void => {
+                if (error) {
+                    reject(error);
+                } else {
+                    resolve();
+                }
+            };
+
+            if (typeof mode === 'number') {
+                this.volume.access(path, mode, fulfill);
+            } else {
+                this.volume.access(path, fulfill);
+            }
         });
     }
 }

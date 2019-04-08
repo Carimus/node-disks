@@ -10,4 +10,5 @@ export interface AsyncFSModule {
     createWriteStream: (path: string) => stream.Writable;
     unlink: (file: string) => Promise<void>;
     mkdirp: (dirPath: string) => Promise<void>;
+    access: (file: string, mode?: number) => Promise<void>;
 }

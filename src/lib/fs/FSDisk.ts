@@ -10,7 +10,7 @@ import {
 } from '../../errors';
 import { DiskConfig, DiskListingObject, DiskObjectType } from '../types';
 import { AsyncFSModule } from './types';
-import { pipeStreams, streamToBuffer } from '../utils';
+import { pipeStreams } from '../utils';
 
 /**
  * Represents a disk that uses a traditional filesystem. Expects an `AsyncFSModule` which is essentially just
@@ -69,6 +69,22 @@ export abstract class FSDisk extends Disk {
     /**
      * @inheritDoc
      */
+    public async read(pathOnDisk: string): Promise<Buffer> {
+        try {
+            return await this.fs.readFile(this.getFullPath(pathOnDisk));
+        } catch (error) {
+            if (error.code === 'EISDIR') {
+                throw new NotAFileError(pathOnDisk);
+            } else if (error.code === 'ENOENT') {
+                throw new NotFoundError(pathOnDisk);
+            }
+            throw error;
+        }
+    }
+
+    /**
+     * @inheritDoc
+     */
     public async createReadStream(pathOnDisk: string): Promise<Readable> {
         const fullPath = this.getFullPath(pathOnDisk);
         // We stat first because createReadStream will create a file if it doesn't already exist.
@@ -90,45 +106,35 @@ export abstract class FSDisk extends Disk {
     }
 
     /**
-     * @inheritDoc
+     * Perform a write operation which involves some prep (creating the leading directory) and the transformation of
+     * certain "expected" errors into more understandable errors for the consumer of the library.
+     *
+     * @param pathOnDisk
+     * @param execute
      */
-    public async createWriteStream(pathOnDisk: string): Promise<Writable> {
+    private async prepareAndExecuteWrite<T>(
+        pathOnDisk: string,
+        execute: (fullPath: string) => Promise<T>,
+    ): Promise<T> {
         const fullPath = this.getFullPath(pathOnDisk);
-        let stats = null;
         try {
-            stats = await this.fs.stat(fullPath);
+            // Ensure the path leading up to the file exists as a directory.
+            await this.fs.mkdirp(path.dirname(fullPath));
         } catch (error) {
-            if (error.code !== 'ENOENT') {
-                // If the file doesn't exists, that's good! Continue. Otherwise throw.
-                throw error;
-            }
-        }
-        // If the file exists and it's not a file, fail.
-        if (stats && !stats.isFile()) {
-            throw new NotWritableDestinationError(pathOnDisk);
-        }
-
-        try {
-            return this.fs.createWriteStream(fullPath);
-        } catch (error) {
-            if (error.code === 'EISDIR') {
+            // EEXIST is what node `fs` and `fs-extra` will throw if the leading path exists as a non-directory.
+            // ENOTDIR is what `memfs` throws if the leading path exists as a non-directory.
+            // Both of these will catch trying to write to `/foo/bar.txt` where `/foo` is a file.
+            if (error.code === 'EEXIST' || error.code === 'ENOTDIR') {
                 throw new NotWritableDestinationError(pathOnDisk);
             }
             throw error;
         }
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public async read(pathOnDisk: string): Promise<Buffer> {
         try {
-            return await this.fs.readFile(this.getFullPath(pathOnDisk));
+            // Execute the write, capturing and wrapping important errors as necessary.
+            return await execute(fullPath);
         } catch (error) {
-            if (error.code === 'EISDIR') {
-                throw new NotAFileError(pathOnDisk);
-            } else if (error.code === 'ENOENT') {
-                throw new NotFoundError(pathOnDisk);
+            if (error.code === 'EISDIR' || error.code === 'EACCES') {
+                throw new NotWritableDestinationError(pathOnDisk);
             }
             throw error;
         }
@@ -141,20 +147,35 @@ export abstract class FSDisk extends Disk {
         pathOnDisk: string,
         body: Buffer | string | Readable,
     ): Promise<void> {
-        try {
-            if (typeof body === 'object' && body instanceof Readable) {
-                // If we were provided with a stream, we'll delegate to `createWriteStream`
-                const writeStream = await this.createWriteStream(pathOnDisk);
-                await pipeStreams(body, writeStream);
-            } else {
-                await this.fs.writeFile(this.getFullPath(pathOnDisk), body);
-            }
-        } catch (error) {
-            if (error.code === 'EISDIR') {
-                throw new NotWritableDestinationError(pathOnDisk);
-            }
-            throw error;
-        }
+        return this.prepareAndExecuteWrite(
+            pathOnDisk,
+            async (fullPath: string): Promise<void> => {
+                if (typeof body === 'object' && body instanceof Readable) {
+                    // If we were provided with a stream, we'll open up a stream and pipe to it.
+                    const writeStream = await this.fs.createWriteStream(
+                        fullPath,
+                    );
+                    await pipeStreams(body, writeStream);
+                } else {
+                    // Otherwise we have a string or a buffer so we can just write the contents using writeFile
+                    await this.fs.writeFile(fullPath, body);
+                }
+            },
+        );
+    }
+
+    /**
+     * Create a write stream to a file on the disk. Note that errors like EISDIR aren't thrown by the createWriteStream
+     * function and instead are emitted as errors on the stream so those will be raw unwrapped errors.
+     * @inheritDoc
+     */
+    public async createWriteStream(pathOnDisk: string): Promise<Writable> {
+        return this.prepareAndExecuteWrite(
+            pathOnDisk,
+            async (fullPath: string): Promise<Writable> => {
+                return this.fs.createWriteStream(fullPath);
+            },
+        );
     }
 
     /**

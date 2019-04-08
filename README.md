@@ -184,16 +184,19 @@ for inline documentation and types.
     -   `Readable` stream passed to `MemoryDisk`/`LocalDisk`
     -   Properly handled symlinks in directory listings for `MemoryDisk`/`LocalDisk`
     -   Proper errors from bad permissions for `MemoryDisk`/`LocalDisk`
+    -   Multiple writes to the same file do truncate
 -   [ ] Document the `Disk` API.
 -   [ ] Document the `DiskManager` API.
 -   [ ] Support `rimraf` for directories.
--   [ ] Fix `FSDisk` (backend to `MemoryDisk` and `LocalDisk`) to `mkdirp` path to file to mirror s3 behaviour.
--   [ ] When a file is deleted on `FSDisk` and its the only file in the directory, delete the directory, following the
-        path backwards to do the same to get rid of all fs tree leaves.
 -   [ ] Support `force` for delete which doesn't to mimic `rm -f` which doesn't fail if the file isn't found.
 -   [ ] Separate driver from remaining options so that the `driver` options doesn't have to be passed to `*Disk`
         constructors.
 -   [ ] Wrap all unknown errors in an `UnknownDiskError` (maybe using `VError`?)
+-   [ ] Ensure that when memfs is used, we always use the posix path module even on a win32 host FS (or otherwise
+        verify that on win32, memfs uses win32 paths).
+-   [ ] Proxy read and write streams so that errors emitted on streams can be wrapped
+-   [ ] Upgrade `CodedError` to also contain a reference to the original system/driver error
+-   [ ] LocalDisk config setting to filter directory listings by only accessible files/directories.
 
 ## Development
 
