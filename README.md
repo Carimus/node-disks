@@ -198,6 +198,9 @@ for inline documentation and types.
 -   [ ] Proxy read and write streams so that errors emitted on streams can be wrapped
 -   [ ] Upgrade `CodedError` to also contain a reference to the original system/driver error
 -   [ ] LocalDisk config setting to filter directory listings by only accessible files/directories.
+-   [ ] Support additional basic filesystem operations:
+    -   [ ] Copy
+    -   [ ] Move
 
 ## Development
 
