@@ -185,6 +185,7 @@ for inline documentation and types.
     -   Properly handled symlinks in directory listings for `MemoryDisk`/`LocalDisk`
     -   Proper errors from bad permissions for `MemoryDisk`/`LocalDisk`
     -   Multiple writes to the same file do truncate
+    -   Listings always include directories first
 -   [ ] Document the `Disk` API.
 -   [ ] Document the `DiskManager` API.
 -   [ ] Support `rimraf` for directories.
