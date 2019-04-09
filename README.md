@@ -174,6 +174,16 @@ for inline documentation and types.
 -   `async geDisk(name: string, options: DiskManagerOptions): Disk` to get a disk by name (allowing
     for aliases in config).
 
+### Utils
+
+This library also exports some helper methods:
+
+-   `async pipeStreams(readable: Readable, writable: Writable): Promise<string>` pipes a readable stream into a
+    writable stream and waits until it completes. It will reject if the pipe stream emits an error and will otherwise
+    resolve with the name of the event that the stream closed with (i.e. `'close'` or `'finish'`).
+-   `async streamToBuffer(stream: Readable): Promise<Buffer>` pipes a readable stream into a single buffer. Rejects if
+    the stream emits an error.
+
 ## TODO
 
 -   [ ] Make the `MemoryDisk` test generic to run on any `Disk` and figure out how to run it safely with `LocalDisk`

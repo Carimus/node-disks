@@ -5,13 +5,13 @@ export * from './lib/types';
 export * from './lib/fs/types';
 export * from './lib/DiskManager';
 export * from './lib/Disk';
+export { pipeStreams, streamToBuffer } from './lib/utils';
 export * from './drivers/s3/S3Disk';
 export * from './drivers/s3/types';
 export * from './drivers/local/LocalDisk';
 export * from './drivers/local/types';
 export * from './drivers/memory/MemoryDisk';
 export * from './errors'
-export * from './'
 
 // Kept around for backwards compatibility.
 export const errors = allErrors;
