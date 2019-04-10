@@ -186,6 +186,7 @@ This library also exports some helper methods:
 
 ## TODO
 
+-   [ ] Hoist down the `withTempFile` logic from `@carimus/node-uploads` to this package.
 -   [ ] Make the `MemoryDisk` test generic to run on any `Disk` and figure out how to run it safely with `LocalDisk`
         and `S3Disk`:
     -   `S3Disk`: credentials and bucket from environment with cleanup `afterEach` and don't fail if env variables
