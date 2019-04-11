@@ -11,9 +11,14 @@ export enum DiskDriver {
 }
 
 /**
+ * Any config object for any driver.
+ */
+export type AnyDiskConfig = DiskConfig | S3DiskConfig | LocalDiskConfig;
+
+/**
  * Specifies a disk driver and its config
  */
-export interface DiskSpecification<C extends DiskConfig> {
+export interface DiskSpecification {
     /**
      * The driver to use for the disk.
      */
@@ -22,45 +27,15 @@ export interface DiskSpecification<C extends DiskConfig> {
     /**
      * The configuration for the disk.
      */
-    config?: C;
+    config?: AnyDiskConfig;
 }
-
-/**
- * A specification for an S3Disk.
- */
-export interface S3DiskSpecification extends DiskSpecification<S3DiskConfig> {
-    driver: DiskDriver.S3;
-}
-
-/**
- * A specification for a MemoryDisk
- */
-export interface MemoryDiskSpecification extends DiskSpecification<DiskConfig> {
-    driver: DiskDriver.Memory;
-}
-
-/**
- * A specification for a LocalDisk
- */
-export interface LocalDiskSpecification
-    extends DiskSpecification<LocalDiskConfig> {
-    driver: DiskDriver.Local;
-}
-
-/**
- * Any valid disk specification for any type of disk.
- */
-export type AnyDiskSpecification =
-    | S3DiskSpecification
-    | MemoryDiskSpecification
-    | LocalDiskSpecification;
 
 /**
  * A specification paired with its name.
  */
 export interface AnyNamedDiskSpecification {
     name: string;
-    specification: AnyDiskSpecification;
+    specification: DiskSpecification;
 }
 
 /**
@@ -86,7 +61,7 @@ export interface DiskManagerConfig {
      * All other config keys are disk names mapped to the name of the disk their an alias for OR an actual
      * DiskSpecification.
      */
-    [key: string]: string | AnyDiskSpecification;
+    [key: string]: string | DiskSpecification;
 }
 
 /**
