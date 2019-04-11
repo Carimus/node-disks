@@ -97,7 +97,20 @@ const bar: Disk = diskManager.getDisk('bar');
 // Use `foo` and `bar` not worrying about their implementation like in Option A.
 ```
 
-## Supported Drivers
+## Supported Drivers and Options
+
+### Common
+
+All drivers inherit from and implement the abstract [`Disk`](#disk-abstract-class) class and as such inherit some
+default base functionality and options.
+
+#### Common Disk Options
+
+| Name                   | Type    | Description                                                                                                |
+| ---------------------- | ------- | ---------------------------------------------------------------------------------------------------------- |
+| `url`                  | string  | Optional; If the disk supports URLs, this is the base URL to prepend to paths                              |
+| `temporaryUrlExpires`  | number  | Optional; If the disk supports temp URLs, how many seconds after generation do they expire? Default 1 day. |
+| `temporaryUrlFallback` | boolean | Optional; If the disk supports URLs but not temp URLs, should it by default fallback to permanent URLs?    |
 
 ### Memory
 
@@ -166,6 +179,16 @@ A disk that uses a remote AWS S3 bucket.
     directory on the disk.
 -   `getName(): string | null` to get the name of the disk if it was created with one. The `DiskManager` will
     automatically and appropriately set this to the actual resolved name of the disk from the config.
+-   `getUrl(path: string): string | null` to get a URL to an object if the disk supports it and is configured
+    appropriately. If the disk doesn't support URLs, `null` is returned.
+-   `getTemporaryUrl(path: string, expires: number, fallback: boolean): string | null` to get a temporary URL to an
+    object if the disk supports it and is configured appropriately. This method by default won't fallback to
+    generating permanent URLs but can if `fallback` is explicitly passed as `true` or if the disk is configured with
+    `temporaryUrlFallback` set to `true`. If the disk doesn't support temporary URLs and can't fallback to permanent
+    URLs, `null` is returned.
+-   `isTemporaryUrlValid(temporaryUrl: string, against: number | Date = Date.now()): boolean | null` to determine if
+    a temporary URL generated with `getTemporaryUrl` is valid (i.e. unexpired). Will return `null` if the URL can't
+    be determined either way or if the disk does not support temporary URLs.
 
 ### [`MemoryDisk`](./src/drivers/memory/MemoryDisk.ts) Class (extends [`Disk`](#disk-abstract-class))
 
