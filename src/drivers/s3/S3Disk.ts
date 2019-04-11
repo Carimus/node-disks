@@ -1,6 +1,6 @@
 import * as AWS from 'aws-sdk';
 import { Readable, Writable } from 'stream';
-import { Disk, DiskListingObject, DiskObjectType } from '../..';
+import { Disk, DiskListingObject, DiskObjectType, streamToBuffer } from '../..';
 import {
     NotAFileError,
     NotFoundError,
@@ -13,7 +13,7 @@ import {
     S3NodeBody,
     S3ObjectParams,
 } from './types';
-import { streamToBuffer } from '../../lib/utils';
+import joinUrl = require('url-join');
 
 /**
  * Represents a remote AWS S3 disk.
@@ -55,6 +55,20 @@ export class S3Disk extends Disk {
      */
     public setS3Client(client: AWS.S3): void {
         this.s3Client = client;
+    }
+
+    /**
+     * Get the default disk URL. If this is provided in config, it will be returned. Otherwise we'll generate the
+     * default public s3 url with the appropriate key prefix.
+     */
+    public getDefaultDiskUrl(): string | null {
+        return (
+            this.config.url ||
+            joinUrl(
+                `https://${this.config.bucket}.s3.amazonaws.com/`,
+                this.getKeyPrefix(),
+            )
+        );
     }
 
     /**
@@ -414,5 +428,57 @@ export class S3Disk extends Disk {
             })),
             ...files.map((name) => ({ name, type: DiskObjectType.File })),
         ];
+    }
+
+    /**
+     * Generate a signed URL for the specified object in the bucket.
+     *
+     * @param path
+     * @param expires
+     * @param fallback
+     */
+    public getTemporaryUrl(
+        path: string,
+        expires: number = this.getDefaultTemporaryUrlExpires(),
+        fallback: boolean = this.shouldTemporaryUrlsFallbackByDefault(),
+    ): string | null {
+        const signedUrl = this.s3Client.getSignedUrl('getObject', {
+            ...this.getObjectParams(path),
+            Expires: expires,
+        });
+        return signedUrl || (fallback ? this.getUrl(path) : null);
+    }
+
+    /**
+     * Parse an S3 signed url and determine if it's valid (unexpired) against a specific time.
+     *
+     * Important note: this URL does not (currently) validate the signature of the URL.
+     *
+     * @param temporaryUrl
+     * @param against
+     */
+    public isTemporaryUrlValid(
+        temporaryUrl: string,
+        against: number | Date = Date.now(),
+    ): boolean | null {
+        // If a date was provided for `against` convert it.
+        const againstEpoch =
+            against instanceof Date ? against.valueOf() : against;
+        let parsedUrl = null;
+        try {
+            parsedUrl = new URL(temporaryUrl);
+        } catch (error) {
+            // If the RL couldn't be parsed, indicate indeterminate.
+            return null;
+        }
+        // Fetch the Expires query parameter from the URL and if it doesn't exist, indicate indeterminate.
+        const urlExpiresRaw = parsedUrl.searchParams.get('Expires');
+        if (!urlExpiresRaw) {
+            return null;
+        }
+        // Convert the AWS time which is in seconds to milliseconds which is what JS uses for epoch times
+        const urlExpiresEpoch = parseInt(urlExpiresRaw) * 1000;
+        // Confirm that the URL's expiry time is after the timestamp we're checking against.
+        return againstEpoch < urlExpiresEpoch;
     }
 }
