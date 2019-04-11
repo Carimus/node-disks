@@ -26,7 +26,7 @@ export abstract class FSDisk extends Disk {
      */
     protected fs: AsyncFSModule;
 
-    public constructor(config: DiskConfig, name?: string) {
+    public constructor(config?: DiskConfig, name?: string) {
         super(config, name);
         // Set the fs module to use internally
         this.fs = this.getAsyncFsModule();

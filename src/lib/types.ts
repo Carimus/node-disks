@@ -1,42 +1,27 @@
-import { S3 } from 'aws-sdk';
-
-/**
- * Available drivers
- */
-export enum DiskDriver {
-    Memory = 'memory',
-    Local = 'local',
-    S3 = 's3',
-}
-
 /**
  * The common config options for all disks.
  */
 export interface DiskConfig {
     /**
-     * The driver to use.
+     * A base URL that the contents of the disk should be available at from their path. Different drivers have
+     * different defaults but typically if this is not provided, the disk will not support generating URLs.
      */
-    driver: DiskDriver;
-}
+    url?: string;
 
-/**
- * A map/dictionary of disk names to their config objects. If the value is a
- * string, than it's considered an alias and looked up recursively from the
- * root of the config.
- */
-export interface DiskManagerConfig {
-    default: string | DiskConfig;
-    [key: string]: string | DiskConfig;
-}
-
-/**
- * Options that can be passed to the DiskManager
- */
-export interface DiskManagerOptions {
     /**
-     * A pre-initialized s3 client to use instead of creating a new one.
+     * How many seconds a temporary URL should by default expire in. Default: 86400 seconds (1 day)
      */
-    s3Client?: S3;
+    temporaryUrlExpires?: number;
+
+    /**
+     * Whether or not to fallback to permanent URLs when the disk doesn't support temporary URLs. Default: false
+     */
+    temporaryUrlFallback?: boolean;
+
+    /**
+     * Other config options are possible depending on the driver.
+     */
+    [key: string]: any;
 }
 
 /**
