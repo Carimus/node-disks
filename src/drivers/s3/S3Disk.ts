@@ -251,12 +251,15 @@ export class S3Disk extends Disk {
         if (await this.doObjectParamsMatchDirectoryObject(params)) {
             throw new NotWritableDestinationError(path);
         }
-        await this.s3Client
-            .putObject({
-                ...params,
-                Body: body,
-            })
-            .promise();
+
+        // If we got a Readable stream we need to use `upload` instead of `putObject` since `upload` can handle
+        // streams of arbitrary length.
+        const operation =
+            typeof body === 'object' && body instanceof Readable
+                ? this.s3Client.upload({ ...params, Body: body })
+                : this.s3Client.putObject({ ...params, Body: body });
+
+        await operation.promise();
     }
 
     /**
