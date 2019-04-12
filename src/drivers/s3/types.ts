@@ -49,6 +49,11 @@ export interface S3DiskConfig extends DiskConfig {
      * If you're not using environment variables to authenticate the AWS client, you can provide credentials here.
      */
     clientConfig?: {};
+
+    /**
+     * Should we use the `mime` library to automatically determine `ContentType` for write operations?
+     */
+    autoContentType?: boolean;
 }
 
 /**

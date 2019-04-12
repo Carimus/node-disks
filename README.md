@@ -155,14 +155,15 @@ A disk that uses a remote AWS S3 bucket.
 
 #### S3 Disk Options
 
-| Name           | Type   | Description                                                                                                               |
-| -------------- | ------ | ------------------------------------------------------------------------------------------------------------------------- |
-| `bucket`       | string | Required; The S3 bucket to use.                                                                                           |
-| `root`         | string | Optional; The prefix to use for storing objects in the bucket. Defaults to the root                                       |
-| `pagingLimit`  | number | Optional; Num of max results to fetch when paging through an S3 `listObjectsV2` call. Defaults to `1000`, the max.        |
-| `expires`      | number | Optional; Number of seconds from time of upload to set `Expires` and `Cache-Control` for `putObject` calls.               |
-| `putParams`    | object | Optional; Additional params to merge into all `putObject` calls                                                           |
-| `clientConfig` | object | Optional; Options to pass to the `AWS.S3` client constructor. Can be used to pass credentials if not using env variables. |
+| Name              | Type   | Description                                                                                                               |
+| ----------------- | ------ | ------------------------------------------------------------------------------------------------------------------------- |
+| `bucket`          | string | Required; The S3 bucket to use.                                                                                           |
+| `root`            | string | Optional; The prefix to use for storing objects in the bucket. Defaults to the root                                       |
+| `pagingLimit`     | number | Optional; Num of max results to fetch when paging through an S3 `listObjectsV2` call. Defaults to `1000`, the max.        |
+| `expires`         | number | Optional; Number of seconds from time of upload to set `Expires` and `Cache-Control` for `putObject` calls.               |
+| `putParams`       | object | Optional; Additional params to merge into all `putObject` calls                                                           |
+| `clientConfig`    | object | Optional; Options to pass to the `AWS.S3` client constructor. Can be used to pass credentials if not using env variables. |
+| `autoContentType` | bool   | Optional; Use the `mime` library to guess `ContentType` for write operations. Defaults to `true`                          |
 
 ## API
 

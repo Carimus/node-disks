@@ -1,5 +1,6 @@
 import * as AWS from 'aws-sdk';
 import { Readable, Writable } from 'stream';
+import { getType as getMimeType } from 'mime';
 import { Disk, DiskListingObject, DiskObjectType, streamToBuffer } from '../..';
 import {
     NotAFileError,
@@ -112,6 +113,15 @@ export class S3Disk extends Disk {
     }
 
     /**
+     * Generate a putObject params partial object containing ContentType if the mime type of the path is guessable.
+     * @param path
+     */
+    public static getContentTypeParams(path: string): { ContentType?: string } {
+        const mimeType = getMimeType(path);
+        return mimeType ? { ContentType: mimeType } : {};
+    }
+
+    /**
      * Get the putObject params for putting a file to a specific object path on the disk.
      *
      * @param path
@@ -120,6 +130,7 @@ export class S3Disk extends Disk {
         const {
             putParams: extraPutParams = null,
             expires: rawExpires = null,
+            autoContentType = true,
         } = this.config;
         const objectParams = this.getObjectParams(path);
         const expires = rawExpires ? parseInt(rawExpires as string, 10) : null;
@@ -130,8 +141,12 @@ export class S3Disk extends Disk {
                       CacheControl: `max-age=${expires}`,
                   }
                 : {};
+        const contentTypeParams = autoContentType
+            ? S3Disk.getContentTypeParams(path)
+            : {};
         return {
             ...expiresParams,
+            ...contentTypeParams,
             ...(extraPutParams || {}),
             ...objectParams,
         };
