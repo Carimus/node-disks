@@ -1,5 +1,10 @@
+import * as fs from 'fs';
+import { promisify } from 'util';
 import { MemoryDisk } from './MemoryDisk';
 import { streamToBuffer } from '../..';
+
+const readFileFromLocalFilesystem = promisify(fs.readFile);
+const deleteFromLocalFilesystem = promisify(fs.unlink);
 
 test("memory disk's basic methods work", async () => {
     const disk = new MemoryDisk();
@@ -85,4 +90,42 @@ test('memory disk can generate URLs if one is provided in config', async () => {
     expect(
         diskWithUrlsAndTempFallback.getTemporaryUrl('test.txt', 1000, true),
     ).toBe('http://localhost:1234/test.txt');
+});
+
+test('memory disk can create temp files for local manipulation', async () => {
+    const disk = new MemoryDisk();
+
+    // Write a file to the disk
+    const path = 'foo.txt';
+    const originalFileData = Buffer.from('this is a test', 'utf8');
+    await disk.write(path, originalFileData);
+
+    // Get the temp file for it and check to make sure their contents match
+    const tempPath = await disk.withTempFile(path, async (path: string) => {
+        const tempFileData = await readFileFromLocalFilesystem(path);
+        expect(tempFileData.toString('base64')).toBe(
+            originalFileData.toString('base64'),
+        );
+    });
+
+    // Ensure that once the callback is completed, the file doesn't exist since we didn't tell it not to cleanup
+    expect(tempPath).toBeTruthy();
+    await expect(readFileFromLocalFilesystem(tempPath)).rejects.toBeTruthy();
+
+    // Do the same stuff again but using the bypass cleanup approach to take cleanup into our own hands
+    const persistentTempPath = await disk.withTempFile(path);
+    expect(persistentTempPath).toBeTruthy();
+    const persistentTempFileData = await readFileFromLocalFilesystem(
+        persistentTempPath,
+    );
+    expect(persistentTempFileData.toString('base64')).toBe(
+        originalFileData.toString('base64'),
+    );
+    // Note that we use `.resolves.toBeUndefined()` to verify the file is deleted (unlink resolves with void/undefined)
+    expect(
+        deleteFromLocalFilesystem(persistentTempPath),
+    ).resolves.toBeUndefined();
+    expect(
+        readFileFromLocalFilesystem(persistentTempPath),
+    ).rejects.toBeTruthy();
 });

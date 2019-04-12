@@ -189,6 +189,17 @@ A disk that uses a remote AWS S3 bucket.
 -   `isTemporaryUrlValid(temporaryUrl: string, against: number | Date = Date.now()): boolean | null` to determine if
     a temporary URL generated with `getTemporaryUrl` is valid (i.e. unexpired). Will return `null` if the URL can't
     be determined either way or if the disk does not support temporary URLs.
+-   `async withTempFile(path: string, execute: ((path: string) => Promise<void> | void) | null, extraOptions?: import('tmp').FileOptions): Promise<string>`
+    to stream the contents of a file from the disk to a temporary file on the local filesystem for performing operations
+    that are easier (or more performant, etc.) to do with local data on the disk as opposed to in memory
+    (e.g. `disk.read(path)`).
+    -   The caller can pass an async `execute` callback which will get a string path to the temp
+        file that contains the disk file's contents. Once `execute` returns/resolves, the file will be automatically
+        deleted. If an `execute` callback is not provided, the function will resolve with the path to the temp file.
+        **IMPORTANT:** it's the caller's responsibility using this approach to `unlink` the file when they're done with
+        it.
+    -   This functionality is achieved using `tmp`. You can pass any additional `FileOptions` through to `tmp` (i.e.
+        `prefix`) using the third parameter `extraOptions`.
 
 ### [`MemoryDisk`](./src/drivers/memory/MemoryDisk.ts) Class (extends [`Disk`](#disk-abstract-class))
 
@@ -254,7 +265,6 @@ This library also exports some helper methods:
 
 ## TODO
 
--   [ ] Hoist down the `withTempFile` logic from `@carimus/node-uploads` to this package.
 -   [ ] Make the `MemoryDisk` test generic to run on any `Disk` and figure out how to run it safely with `LocalDisk`
         and `S3Disk`:
     -   `S3Disk`: credentials and bucket from environment with cleanup `afterEach` and don't fail if env variables

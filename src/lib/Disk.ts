@@ -1,5 +1,7 @@
 import * as stream from 'stream';
+import * as fs from 'fs';
 import { DiskConfig, DiskListingObject, DiskObjectType } from './types';
+import { pipeStreams, withTempFile } from './utils';
 import joinUrl = require('url-join');
 
 /**
@@ -209,5 +211,48 @@ export abstract class Disk {
         against: number | Date = Date.now(),
     ): boolean | null {
         return null;
+    }
+
+    /**
+     * Download the file to the local disk as a temporary file for operations that require local data manipulation
+     * and which can't handle Buffers, i.e. operations expected to be performed on large files where it's easier to
+     * deal with the data in chunks off of the disk or something instead of keeping them in a Buffer in memory in their
+     * entirety.
+     *
+     * This methods streams the data directly to the local filesystem so large files shouldn't cause any memory issues.
+     *
+     * If an `execute` callback is not provided, the cleanup step will be skipped and the path that this resolves to
+     * will exist and can be manipulated directly. IMPORTANT: in such a scenario, the caller is responsible for
+     * deleting the file when they're done with it.
+     *
+     * @param path
+     * @param execute
+     * @param extraOptions
+     */
+    public async withTempFile(
+        path: string,
+        execute: ((path: string) => Promise<void> | void) | null = null,
+        extraOptions?: import('tmp').FileOptions,
+    ): Promise<string> {
+        // Create a temp file, write the disk file's data to it, and pass its path to
+        return withTempFile(
+            async (tmpFilePath: string) => {
+                // Create a write stream to the temp file that will auto close once the stream is fully piped.
+                const tempFileWriteStream = fs.createWriteStream(tmpFilePath, {
+                    autoClose: true,
+                });
+                // Create a read stream for the file on the disk.
+                const diskFileReadStream = await this.createReadStream(path);
+                // Pipe the disk read stream to the temp file write stream.
+                await pipeStreams(diskFileReadStream, tempFileWriteStream);
+                // Run the caller callback if it was provided.
+                if (execute) {
+                    await execute(tmpFilePath);
+                }
+            },
+            // Skip clean up if no execute callback is provided.
+            !execute,
+            extraOptions,
+        );
     }
 }
