@@ -77,7 +77,7 @@
         "memfs": "^2.15.2",
         "npm-watch": "^0.6.0",
         "prettier": "1.16.4",
-        "semantic-release": "^15.13.3",
+        "semantic-release": "^17.2.3",
         "ts-jest": "^24.0.0",
         "typescript": "^3.3.4000"
     },
