@@ -16,7 +16,7 @@ updates:
         versions:
           - ">= 10"
   - package-ecosystem: "github-actions"
-     open-pull-requests-limit: 10
+    open-pull-requests-limit: 10
     directory: "/"
     reviewers:
       - "KristenKatona"
