@@ -51,7 +51,7 @@
     "devDependencies": {
         "@commitlint/cli": "^7.5.2",
         "@commitlint/config-conventional": "^7.5.0",
-        "@types/fs-extra": "^5.0.5",
+        "@types/fs-extra": "^9.0.12",
         "@types/jest": "^24.0.11",
         "@types/mime": "^2.0.1",
         "@types/ramda": "types/npm-ramda#dist",
