@@ -7,7 +7,7 @@ jobs:
         runs-on: ubuntu-latest
         steps:
             # Checkout the repo at the push ref
-            - uses: actions/checkout@v2.3.4
+            - uses: actions/checkout@v3.3.0
             # Install deps
             - name: Install
               run: yarn
